@@ -143,7 +143,7 @@ export default function CoffeeQuiz() {
               <div key={step.id} className="flex flex-col items-center gap-2 z-10">
                 <motion.div
                   animate={{
-                    backgroundColor: done || active ? "#b87333" : "transparent",
+                    backgroundColor: done || active ? "#b87333" : "rgba(0, 0, 0, 0)",
                     borderColor: done || active ? "#b87333" : "rgba(255,255,255,0.2)",
                     scale: active ? 1.2 : 1,
                   }}

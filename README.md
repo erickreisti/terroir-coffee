@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/erickreisti/terroir-coffee/main/public/globe.svg" width="80" alt="Terroir Logo"/>
-  <h1>Terroir Coffee Co.</h1>
+  <img src="https://raw.githubusercontent.com/erickreisti/terroir-coffee/main/public/logo.svg" height="80" alt="Terroir Logo"/>
+  <br/>
   <p><strong>A Next-Generation E-commerce Experience</strong></p>
   
   <p>

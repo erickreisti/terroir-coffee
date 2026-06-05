@@ -1,0 +1,22 @@
+<svg width="400" height="100" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .logo-text {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 52px;
+      font-weight: 600;
+      letter-spacing: 12px;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+    @media (prefers-color-scheme: dark) {
+      .logo-text { fill: #fcfbf9; }
+    }
+    @media (prefers-color-scheme: light) {
+      .logo-text { fill: #0a0705; }
+    }
+    .dot { fill: #b87333; }
+  </style>
+  <text x="50%" y="55%" class="logo-text">
+    TERROIR<tspan class="dot">.</tspan>
+  </text>
+</svg>

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Instagram, Twitter, Youtube } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { FaInstagram, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { motion, Variants } from "framer-motion";
 
 const containerVariants: Variants = {
@@ -50,13 +51,13 @@ export default function Footer() {
           
           <div className="flex items-center gap-4">
             <Link href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-coffee-caramel hover:border-coffee-caramel hover:bg-coffee-caramel/10 transition-all font-sans text-xs font-bold tracking-wider">
-              <Instagram className="w-4 h-4" />
+              <FaInstagram className="w-4 h-4" />
             </Link>
             <Link href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-coffee-caramel hover:border-coffee-caramel hover:bg-coffee-caramel/10 transition-all font-sans text-xs font-bold tracking-wider">
-              <Twitter className="w-4 h-4" />
+              <FaXTwitter className="w-4 h-4" />
             </Link>
             <Link href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-coffee-caramel hover:border-coffee-caramel hover:bg-coffee-caramel/10 transition-all font-sans text-xs font-bold tracking-wider">
-              <Youtube className="w-4 h-4" />
+              <FaYoutube className="w-4 h-4" />
             </Link>
           </div>
         </motion.div>

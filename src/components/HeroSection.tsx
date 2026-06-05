@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { LuArrowRight } from "react-icons/lu";
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -159,7 +159,7 @@ export default function HeroSection() {
             <div className="relative z-10 inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm font-medium transition-all duration-300 group-hover:bg-white/10 group-hover:border-white/30 text-white w-fit shadow-lg">
               Iniciar Avaliação
               <div className="bg-coffee-caramel rounded-full p-2 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110 shadow-md">
-                <ArrowRight className="w-4 h-4 text-white" />
+                <LuArrowRight className="w-4 h-4 text-white" />
               </div>
             </div>
           </Link>
@@ -204,7 +204,7 @@ export default function HeroSection() {
             <div className="relative z-10 inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full border border-white/10 bg-white/10 backdrop-blur-sm font-medium transition-all duration-300 group-hover:bg-white/20 group-hover:border-white/40 text-white w-fit shadow-lg">
               Explorar Catálogo
               <div className="bg-coffee-dark rounded-full p-2 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110 shadow-md">
-                <ArrowRight className="w-4 h-4 text-white" />
+                <LuArrowRight className="w-4 h-4 text-white" />
               </div>
             </div>
           </Link>

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
-import { ArrowLeft, CreditCard, Lock, CheckCircle2 } from 'lucide-react';
+import { LuArrowLeft, LuCreditCard, LuLock, LuCircleCheck } from "react-icons/lu";
 import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
@@ -18,7 +18,7 @@ export default function CheckoutPage() {
         <h1 className="font-serif text-3xl mb-4">Seu carrinho está vazio.</h1>
         <p className="text-white/50 mb-8">Parece que você ainda não selecionou seu Terroir.</p>
         <Link href="/" className="text-coffee-caramel hover:text-[#ffd6a5] transition-colors flex items-center gap-2">
-          <ArrowLeft className="w-4 h-4" /> Voltar para a loja
+          <LuArrowLeft className="w-4 h-4" /> Voltar para a loja
         </Link>
       </div>
     );
@@ -43,7 +43,7 @@ export default function CheckoutPage() {
       <header className="w-full border-b border-white/10 bg-black/20 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-white/50 hover:text-white transition-colors">
-            <ArrowLeft className="w-5 h-5" />
+            <LuArrowLeft className="w-5 h-5" />
             <span className="text-sm font-medium hidden sm:inline">Voltar à loja</span>
           </Link>
           <div className="absolute left-1/2 -translate-x-1/2">
@@ -52,7 +52,7 @@ export default function CheckoutPage() {
             </span>
           </div>
           <div className="flex items-center gap-2 text-white/50 text-xs uppercase tracking-widest font-bold">
-            <Lock className="w-4 h-4 text-coffee-caramel" />
+            <LuLock className="w-4 h-4 text-coffee-caramel" />
             <span>Seguro</span>
           </div>
         </div>
@@ -119,7 +119,7 @@ export default function CheckoutPage() {
                   <div className="relative z-10 space-y-6">
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-white font-medium flex items-center gap-2">
-                        <CreditCard className="w-5 h-5 text-coffee-caramel" />
+                        <LuCreditCard className="w-5 h-5 text-coffee-caramel" />
                         Cartão de Crédito
                       </span>
                       <div className="flex gap-2">
@@ -152,7 +152,7 @@ export default function CheckoutPage() {
                   className="w-full relative overflow-hidden group bg-coffee-caramel hover:bg-[#c9803b] text-white py-5 rounded-full font-bold text-lg tracking-wide transition-all duration-300 shadow-[0_0_40px_rgba(184,115,51,0.3)] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   <span className={`relative z-10 flex items-center justify-center gap-3 ${isProcessing ? 'opacity-0' : 'opacity-100'}`}>
-                    <Lock className="w-5 h-5" />
+                    <LuLock className="w-5 h-5" />
                     Finalizar Compra
                   </span>
                   
@@ -189,7 +189,7 @@ export default function CheckoutPage() {
                       <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg bg-black/20" />
                     ) : (
                       <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="w-6 h-6 text-coffee-caramel/50" />
+                        <LuCircleCheck className="w-6 h-6 text-coffee-caramel/50" />
                       </div>
                     )}
                     <div className="flex-grow">

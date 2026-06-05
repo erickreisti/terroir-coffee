@@ -1,7 +1,7 @@
 "use client";
 
 import { useCart } from '@/context/CartContext';
-import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
+import { LuX, LuMinus, LuPlus, LuShoppingBag } from "react-icons/lu";
 import Link from 'next/link';
 
 export default function CartDrawer() {
@@ -22,21 +22,21 @@ export default function CartDrawer() {
 
         <div className="relative z-10 flex items-center justify-between p-6 border-b border-white/10 bg-transparent">
           <h2 className="font-serif text-2xl font-medium tracking-wide text-white flex items-center gap-3">
-            <ShoppingBag className="w-5 h-5 text-coffee-caramel stroke-[1.5]" />
+            <LuShoppingBag className="w-5 h-5 text-coffee-caramel stroke-[1.5]" />
             Sua Seleção
           </h2>
           <button 
             onClick={closeCart}
             className="p-2 text-white/50 hover:text-white transition-colors rounded-full hover:bg-white/5"
           >
-            <X className="w-5 h-5" />
+            <LuX className="w-5 h-5" />
           </button>
         </div>
 
         <div className="relative z-10 flex-grow overflow-y-auto p-6 custom-scrollbar">
           {items.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-white/40">
-              <ShoppingBag className="w-16 h-16 text-white/10 mb-6 stroke-[1]" />
+              <LuShoppingBag className="w-16 h-16 text-white/10 mb-6 stroke-[1]" />
               <p className="text-lg font-light">Seu carrinho está vazio.</p>
               <button 
                 onClick={closeCart}
@@ -54,7 +54,7 @@ export default function CartDrawer() {
                     <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-xl bg-black/50" />
                   ) : (
                     <div className="w-20 h-20 bg-black/40 rounded-xl flex items-center justify-center border border-white/5">
-                      <ShoppingBag className="w-8 h-8 text-white/20 stroke-[1.5]" />
+                      <LuShoppingBag className="w-8 h-8 text-white/20 stroke-[1.5]" />
                     </div>
                   )}
                   
@@ -82,14 +82,14 @@ export default function CartDrawer() {
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="text-white/50 hover:text-coffee-caramel transition-colors p-1"
                       >
-                        <Minus className="w-3 h-3" />
+                        <LuMinus className="w-3 h-3" />
                       </button>
                       <span className="text-xs font-bold w-4 text-center text-white/90">{item.quantity}</span>
                       <button 
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="text-white/50 hover:text-coffee-caramel transition-colors p-1"
                       >
-                        <Plus className="w-3 h-3" />
+                        <LuPlus className="w-3 h-3" />
                       </button>
                     </div>
                   </div>

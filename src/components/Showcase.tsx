@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, MouseEvent } from "react";
-import { ArrowRight, Check, Star, ShoppingBag } from "lucide-react";
+import { LuArrowRight, LuCheck, LuStar, LuShoppingBag } from "react-icons/lu";
 import { motion, useInView, useMotionValue, useMotionTemplate } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 
@@ -148,7 +148,7 @@ function PlanCard({ plan, isPlansInView, handleSubscribe }: { plan: any, isPlans
         {plan.features.map((feature: string, i: number) => (
           <li key={i} className="flex items-start gap-3">
             <div className="mt-0.5 w-5 h-5 rounded-full bg-coffee-caramel/20 flex items-center justify-center shrink-0">
-              <Check className="w-3 h-3 text-coffee-caramel" />
+              <LuCheck className="w-3 h-3 text-coffee-caramel" />
             </div>
             <span className="text-white/70 text-sm leading-snug">{feature}</span>
           </li>
@@ -291,7 +291,7 @@ export default function Showcase() {
               className="text-white/80 hover:text-coffee-caramel font-medium flex items-center gap-2 group transition-colors pb-2 border-b border-transparent hover:border-coffee-caramel"
             >
               Ver coleção completa
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <LuArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </div>
 
@@ -324,7 +324,7 @@ export default function Showcase() {
                       }}
                       className="bg-coffee-caramel text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-xl"
                     >
-                      <ShoppingBag className="w-4 h-4" />
+                      <LuShoppingBag className="w-4 h-4" />
                       Adicionar
                     </button>
                   </div>
@@ -341,7 +341,7 @@ export default function Showcase() {
                   </div>
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-coffee-caramel text-coffee-caramel" />
+                      <LuStar key={i} className="w-4 h-4 fill-coffee-caramel text-coffee-caramel" />
                     ))}
                     <span className="text-xs text-white/40 ml-2">(Avaliações premium)</span>
                   </div>

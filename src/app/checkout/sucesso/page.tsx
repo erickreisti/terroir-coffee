@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Package } from 'lucide-react';
+import { LuArrowLeft, LuCircleCheck, LuPackage } from "react-icons/lu";
 import { motion } from 'framer-motion';
 
 export default function CheckoutSuccessPage() {
@@ -36,7 +36,7 @@ export default function CheckoutSuccessPage() {
         >
           {/* Brilho pulsante */}
           <div className="absolute inset-0 rounded-full bg-coffee-caramel/30 animate-ping opacity-50" />
-          <CheckCircle2 className="w-12 h-12 text-coffee-caramel relative z-10" />
+          <LuCircleCheck className="w-12 h-12 text-coffee-caramel relative z-10" />
         </motion.div>
 
         <h1 className="font-serif text-5xl md:text-6xl text-white mb-6 tracking-tight">
@@ -53,7 +53,7 @@ export default function CheckoutSuccessPage() {
             href="/" 
             className="group flex items-center gap-3 bg-white/5 border border-white/10 hover:bg-white/10 px-8 py-4 rounded-full transition-all duration-300 backdrop-blur-sm"
           >
-            <ArrowLeft className="w-5 h-5 text-white/50 group-hover:text-white transition-colors" />
+            <LuArrowLeft className="w-5 h-5 text-white/50 group-hover:text-white transition-colors" />
             <span className="font-medium text-white/90">Voltar à Vitrine</span>
           </Link>
 
@@ -61,7 +61,7 @@ export default function CheckoutSuccessPage() {
             href="/" 
             className="group flex items-center gap-3 bg-coffee-caramel hover:bg-[#c9803b] text-white px-8 py-4 rounded-full transition-all duration-300 shadow-[0_0_30px_rgba(184,115,51,0.2)]"
           >
-            <Package className="w-5 h-5" />
+            <LuPackage className="w-5 h-5" />
             <span className="font-bold tracking-wide">Acompanhar Pedido</span>
           </Link>
         </div>

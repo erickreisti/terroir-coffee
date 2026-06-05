@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { ShoppingBag, User } from 'lucide-react';
+import { LuShoppingBag, LuUser } from "react-icons/lu";
 import { useCart } from '@/context/CartContext';
 
 import { useState, useEffect } from 'react';
@@ -49,14 +49,14 @@ export default function Header() {
         {/* Actions */}
         <div className="flex items-center gap-6 text-white">
           <button className="hover:text-coffee-caramel transition-transform hover:scale-110 duration-300" aria-label="Conta">
-            <User className="w-5 h-5 stroke-[1.5]" />
+            <LuUser className="w-5 h-5 stroke-[1.5]" />
           </button>
           <button 
             className="hover:text-coffee-caramel transition-transform hover:scale-110 duration-300 relative group" 
             aria-label="Carrinho"
             onClick={openCart}
           >
-            <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
+            <LuShoppingBag className="w-5 h-5 stroke-[1.5]" />
             {itemCount > 0 && (
               <span className="absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-coffee-caramel text-white text-[10px] font-bold flex items-center justify-center rounded-full shadow-lg border border-coffee-dark/50 group-hover:bg-white group-hover:text-coffee-caramel transition-colors">
                 {itemCount}

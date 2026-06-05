@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { LuArrowRight } from "react-icons/lu";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
@@ -58,7 +58,7 @@ export default function CtaSection() {
             className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full bg-coffee-caramel text-white font-medium hover:bg-white hover:text-coffee-dark transition-all duration-500 shadow-xl shadow-coffee-caramel/20 hover:shadow-2xl hover:shadow-white/20 hover:-translate-y-1 text-lg"
           >
             Escolher Assinatura
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <LuArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           
           <Link 

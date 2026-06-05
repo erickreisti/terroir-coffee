@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Check, Coffee, Droplets, ThermometerSun, Flame, Leaf, Star } from "lucide-react";
+import { LuArrowRight, LuCheck, LuCoffee, LuDroplets, LuThermometerSun, LuFlame, LuLeaf, LuStar } from "react-icons/lu";
 import { useCart } from "@/context/CartContext";
 
 type Step = "intro" | "method" | "flavor" | "result";
@@ -19,21 +19,21 @@ const METHODS = [
     id: "filtro",
     label: "Filtro",
     sublabel: "V60, Melitta, Chemex",
-    icon: <Droplets className="w-8 h-8" />,
+    icon: <LuDroplets className="w-8 h-8" />,
     desc: "Extração limpa que valoriza a acidez e as notas mais delicadas do grão.",
   },
   {
     id: "espresso",
     label: "Espresso",
     sublabel: "Máquina Automática",
-    icon: <Coffee className="w-8 h-8" />,
+    icon: <LuCoffee className="w-8 h-8" />,
     desc: "Alta pressão que concentra sabor e cria uma crema densa e aromática.",
   },
   {
     id: "prensa",
     label: "Prensa Francesa",
     sublabel: "Imersão Total",
-    icon: <ThermometerSun className="w-8 h-8" />,
+    icon: <LuThermometerSun className="w-8 h-8" />,
     desc: "Imersão prolongada que entrega um café encorpado e com textura veludo.",
   },
 ];
@@ -43,21 +43,21 @@ const FLAVORS = [
     id: "doce",
     label: "Doce & Encorpado",
     desc: "Notas de chocolate amargo, caramelo e nozes. Corpo denso.",
-    icon: <Flame className="w-8 h-8" />,
+    icon: <LuFlame className="w-8 h-8" />,
     gradient: "from-amber-900/40 to-yellow-800/20",
   },
   {
     id: "frutado",
     label: "Frutado & Floral",
     desc: "Acidez brilhante, notas cítricas, florais e de frutas vermelhas.",
-    icon: <Leaf className="w-8 h-8" />,
+    icon: <LuLeaf className="w-8 h-8" />,
     gradient: "from-emerald-900/40 to-teal-800/20",
   },
   {
     id: "equilibrado",
     label: "Clássico & Equilibrado",
     desc: "Um pouco de tudo. Cafés completos, fáceis e sempre surpreendentes.",
-    icon: <Star className="w-8 h-8" />,
+    icon: <LuStar className="w-8 h-8" />,
     gradient: "from-stone-700/40 to-stone-600/20",
   },
 ];
@@ -151,7 +151,7 @@ export default function CoffeeQuiz() {
                   className="w-10 h-10 rounded-full border-2 flex items-center justify-center"
                 >
                   {done ? (
-                    <Check className="w-4 h-4 text-white" />
+                    <LuCheck className="w-4 h-4 text-white" />
                   ) : (
                     <span className="text-xs font-bold text-white/60">{i + 1}</span>
                   )}
@@ -179,7 +179,7 @@ export default function CoffeeQuiz() {
               transition={{ duration: 0.5 }}
               className="text-center"
             >
-              <Coffee className="w-20 h-20 mx-auto mb-8 text-coffee-caramel" />
+              <LuCoffee className="w-20 h-20 mx-auto mb-8 text-coffee-caramel" />
               <h3 className="font-serif text-3xl md:text-4xl font-bold mb-6">
                 Pronto para a jornada sensorial?
               </h3>
@@ -192,7 +192,7 @@ export default function CoffeeQuiz() {
                 className="inline-flex items-center gap-3 bg-coffee-caramel hover:bg-coffee-accent text-white px-10 py-4 rounded-full font-medium transition-all text-lg shadow-lg shadow-coffee-caramel/20"
               >
                 Começar o Quiz
-                <ArrowRight className="w-5 h-5" />
+                <LuArrowRight className="w-5 h-5" />
               </button>
             </motion.div>
           )}
@@ -239,7 +239,7 @@ export default function CoffeeQuiz() {
                         animate={{ scale: 1 }}
                         className="absolute top-4 right-4 w-6 h-6 bg-coffee-caramel rounded-full flex items-center justify-center"
                       >
-                        <Check className="w-3 h-3 text-white" />
+                        <LuCheck className="w-3 h-3 text-white" />
                       </motion.div>
                     )}
                   </motion.button>
@@ -289,7 +289,7 @@ export default function CoffeeQuiz() {
                         animate={{ scale: 1 }}
                         className="absolute top-4 right-4 w-6 h-6 bg-coffee-caramel rounded-full flex items-center justify-center"
                       >
-                        <Check className="w-3 h-3 text-white" />
+                        <LuCheck className="w-3 h-3 text-white" />
                       </motion.div>
                     )}
                   </motion.button>
@@ -315,7 +315,7 @@ export default function CoffeeQuiz() {
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                   className="w-24 h-24 bg-coffee-caramel/20 border border-coffee-caramel/40 rounded-full flex items-center justify-center mx-auto mb-8"
                 >
-                  <Check className="w-12 h-12 text-coffee-caramel" />
+                  <LuCheck className="w-12 h-12 text-coffee-caramel" />
                 </motion.div>
                 <span className="text-coffee-caramel tracking-[0.25em] text-xs uppercase font-medium block mb-4">
                   Seu Match Perfeito
@@ -344,7 +344,7 @@ export default function CoffeeQuiz() {
                   className="inline-flex items-center gap-3 bg-coffee-caramel hover:bg-coffee-accent text-white px-10 py-4 rounded-full font-medium transition-all text-lg shadow-lg shadow-coffee-caramel/20"
                 >
                   Assinar por R$ {result.price.toFixed(2).replace(".", ",")}
-                  <ArrowRight className="w-5 h-5" />
+                  <LuArrowRight className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => { setAnswers({ method: "", flavor: "" }); setCurrentStep("intro"); }}

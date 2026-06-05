@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { LuArrowRight } from "react-icons/lu";
 import { FaInstagram, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { motion, Variants } from "framer-motion";
 
@@ -114,7 +114,7 @@ export default function Footer() {
               type="button"
               className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-coffee-caramel text-white flex items-center justify-center hover:scale-105 hover:bg-white hover:text-coffee-dark transition-all shadow-lg shadow-coffee-caramel/20"
             >
-              <ArrowRight className="w-4 h-4" />
+              <LuArrowRight className="w-4 h-4" />
             </button>
           </form>
         </motion.div>

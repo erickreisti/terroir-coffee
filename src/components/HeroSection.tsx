@@ -77,7 +77,6 @@ export default function HeroSection() {
               muted 
               playsInline
               preload="auto"
-              poster="/images/hero_bg.png"
               onTimeUpdate={handleTimeUpdate}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
             >
@@ -135,7 +134,6 @@ export default function HeroSection() {
               muted 
               playsInline
               preload="auto"
-              poster="/images/founders.png"
               onTimeUpdate={handleQuizTimeUpdate}
               className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-70 transition-opacity duration-700 z-0"
             >
@@ -182,7 +180,6 @@ export default function HeroSection() {
               muted 
               playsInline
               preload="auto"
-              poster="/images/store.png"
               onTimeUpdate={handleLojaTimeUpdate}
               className="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:opacity-70 transition-opacity duration-700 z-0"
             >

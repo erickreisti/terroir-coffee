@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { LuArrowRight } from "react-icons/lu";
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 // Animações
@@ -33,6 +33,18 @@ export default function HeroSection() {
   const [isVideoFading, setIsVideoFading] = useState(false);
   const [isQuizFading, setIsQuizFading] = useState(false);
   const [isLojaFading, setIsLojaFading] = useState(false);
+
+  // Estados de Carregamento para o Fade-In
+  const [isMainLoaded, setIsMainLoaded] = useState(false);
+  const [isQuizLoaded, setIsQuizLoaded] = useState(false);
+  const [isLojaLoaded, setIsLojaLoaded] = useState(false);
+
+  // Garantia de que o fade-in vai ocorrer mesmo se o vídeo já estiver em cache
+  useEffect(() => {
+    if (mainVideoRef.current && mainVideoRef.current.readyState >= 3) setIsMainLoaded(true);
+    if (quizVideoRef.current && quizVideoRef.current.readyState >= 3) setIsQuizLoaded(true);
+    if (lojaVideoRef.current && lojaVideoRef.current.readyState >= 3) setIsLojaLoaded(true);
+  }, []);
 
   // Monitora o tempo do vídeo para criar um crossfade suave antes do loop (esconde o corte)
   const handleTimeUpdate = () => {
@@ -66,7 +78,7 @@ export default function HeroSection() {
         
         {/* Bloco Esquerdo (Principal) */}
         <div 
-          className="relative w-full lg:w-[75%] h-[60%] lg:h-full flex items-end p-8 md:p-16 lg:p-24 transition-all duration-700 overflow-hidden cursor-default group"
+          className="relative w-full lg:w-[75%] h-[60%] lg:h-full flex items-end p-8 md:p-16 lg:p-24 transition-all duration-700 overflow-hidden cursor-default group bg-[#0a0705]"
         >
           <div className="absolute inset-0 z-0">
             {/* Background Video */}
@@ -77,9 +89,9 @@ export default function HeroSection() {
               muted 
               playsInline
               preload="auto"
-              poster="/images/poster-hero.jpg"
+              onCanPlay={() => setIsMainLoaded(true)}
               onTimeUpdate={handleTimeUpdate}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-[2000ms] ease-out group-hover:scale-105 ${isMainLoaded ? 'opacity-100' : 'opacity-0'}`}
             >
               <source src="/videos/coffee.mp4" type="video/mp4" />
               Seu navegador não suporta vídeos.
@@ -119,7 +131,7 @@ export default function HeroSection() {
         </div>
 
         {/* Blocos da Direita (Secundários) */}
-        <div className="w-full lg:w-[25%] h-[40%] lg:h-full flex flex-col">
+        <div className="w-full lg:w-[25%] h-[40%] lg:h-full flex flex-col bg-[#0a0705]">
           
           {/* Card Quiz */}
           <Link 
@@ -135,9 +147,9 @@ export default function HeroSection() {
               muted 
               playsInline
               preload="auto"
-              poster="/images/poster-quiz.jpg"
+              onCanPlay={() => setIsQuizLoaded(true)}
               onTimeUpdate={handleQuizTimeUpdate}
-              className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-70 transition-opacity duration-700 z-0"
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[2000ms] ease-out z-0 ${isQuizLoaded ? 'opacity-30 group-hover:opacity-70' : 'opacity-0'}`}
             >
               <source src="/videos/coffee-perfil.mp4" type="video/mp4" />
             </video>
@@ -182,9 +194,9 @@ export default function HeroSection() {
               muted 
               playsInline
               preload="auto"
-              poster="/images/poster-loja.jpg"
+              onCanPlay={() => setIsLojaLoaded(true)}
               onTimeUpdate={handleLojaTimeUpdate}
-              className="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:opacity-70 transition-opacity duration-700 z-0"
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[2000ms] ease-out z-0 ${isLojaLoaded ? 'opacity-25 group-hover:opacity-70' : 'opacity-0'}`}
             >
               <source src="/videos/coffee-shop.mp4" type="video/mp4" />
             </video>

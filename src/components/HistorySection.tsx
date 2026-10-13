@@ -296,6 +296,9 @@ function ParallaxBlock({
 }) {
   const blockRef = useRef<HTMLDivElement>(null);
   const inView = useInView(blockRef, { once: true, margin: "-15%" });
+  // background-image não tem loading="lazy": só aplica a imagem a uma tela de distância,
+  // senão as três baixam junto com o hero e atrasam o LCP
+  const nearView = useInView(blockRef, { once: true, margin: "100% 0px" });
   const [phase, setPhase] = useState<"center" | "settled">("center");
 
   useEffect(() => {
@@ -320,7 +323,7 @@ function ParallaxBlock({
       ref={blockRef}
       // bg-fixed só no desktop: no iOS/mobile o "fixed" é ignorado ou fica pesado
       className="relative h-screen w-full flex items-center overflow-hidden bg-cover bg-center bg-no-repeat lg:bg-fixed"
-      style={{ backgroundImage: `url(${bgImage})` }}
+      style={{ backgroundImage: nearView ? `url(${bgImage})` : undefined }}
     >
       {/* Overlay */}
       <div className="absolute inset-0 z-0" style={{ background: overlayStyle }} />

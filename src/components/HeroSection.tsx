@@ -10,29 +10,55 @@ type LoopVideoProps = {
   className?: string;
   videoRef?: RefObject<HTMLVideoElement | null>;
   autoPlay?: boolean;
+  // Cards: o vídeo só é baixado quando isso vira true (primeiro hover)
+  load?: boolean;
 };
+
+// Resolve depois do load da página e do primeiro LCP pintado, para o vídeo
+// não disputar banda com o que aparece na tela (Safari não tem LCP: só espera o load)
+function afterLcp(cb: () => void) {
+  let done = false;
+  let observer: PerformanceObserver | undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const fire = () => {
+    if (done) return;
+    done = true;
+    observer?.disconnect();
+    clearTimeout(timer);
+    cb();
+  };
+  const onLoad = () => {
+    if (!PerformanceObserver.supportedEntryTypes?.includes("largest-contentful-paint")) return fire();
+    observer = new PerformanceObserver(() => setTimeout(fire, 300));
+    observer.observe({ type: "largest-contentful-paint", buffered: true });
+    timer = setTimeout(fire, 4000);
+  };
+  if (document.readyState === "complete") onLoad();
+  else window.addEventListener("load", onLoad, { once: true });
+  return () => {
+    done = true;
+    observer?.disconnect();
+    clearTimeout(timer);
+    window.removeEventListener("load", onLoad);
+  };
+}
 
 // Vídeo em loop com poster (aparece já no HTML, antes da hidratação)
 // e um fade para a cor de fundo pouco antes do corte do loop.
-function LoopVideo({ name, fadeColor, className = "", videoRef, autoPlay }: LoopVideoProps) {
+function LoopVideo({ name, fadeColor, className = "", videoRef, autoPlay, load }: LoopVideoProps) {
   const [isFading, setIsFading] = useState(false);
-  // O vídeo principal só começa a baixar depois do load da página (o poster já cobre o LCP)
+  // O vídeo principal só começa a baixar depois do LCP (o poster já cobre o LCP)
   // e nem baixa com economia de dados ligada ou em 2G
-  const [src, setSrc] = useState(autoPlay ? undefined : `/videos/${name}.mp4`);
+  const [heroReady, setHeroReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(!autoPlay);
+  const src = (autoPlay ? heroReady : load) ? `/videos/${name}.mp4` : undefined;
 
   useEffect(() => {
     if (!autoPlay) return;
     const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
     if (conn?.saveData || conn?.effectiveType?.includes("2g")) return;
-
-    const start = () => setSrc(`/videos/${name}.mp4`);
-    if (document.readyState === "complete") start();
-    else {
-      window.addEventListener("load", start, { once: true });
-      return () => window.removeEventListener("load", start);
-    }
-  }, [autoPlay, name]);
+    return afterLcp(() => setHeroReady(true));
+  }, [autoPlay]);
 
   return (
     <>
@@ -56,7 +82,7 @@ function LoopVideo({ name, fadeColor, className = "", videoRef, autoPlay }: Loop
         // O vídeo principal já tem a <img> por baixo; poster só nos cards (evita baixar a versão desktop no celular)
         poster={autoPlay ? undefined : `/images/poster-${name}.webp`}
         autoPlay={autoPlay}
-        preload={autoPlay ? "auto" : "metadata"}
+        preload="auto"
         onPlaying={() => setIsPlaying(true)}
         loop
         muted
@@ -104,17 +130,33 @@ const CARDS = [
 
 function HeroCard({ card }: { card: (typeof CARDS)[number] }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hovering = useRef(false);
+  // Só toca no hover, então no celular (sem hover) o vídeo nunca é baixado
+  const [load, setLoad] = useState(false);
+
+  // No primeiro hover o src acabou de entrar: dá play assim que o React aplicar
+  useEffect(() => {
+    if (load && hovering.current) videoRef.current?.play().catch(() => {});
+  }, [load]);
 
   return (
     <Link
       href={card.href}
-      onMouseEnter={() => videoRef.current?.play().catch(() => {})}
-      onMouseLeave={() => videoRef.current?.pause()}
+      onMouseEnter={() => {
+        hovering.current = true;
+        setLoad(true);
+        videoRef.current?.play().catch(() => {});
+      }}
+      onMouseLeave={() => {
+        hovering.current = false;
+        videoRef.current?.pause();
+      }}
       className={`group flex-1 text-white p-8 lg:p-12 flex flex-col justify-center lg:justify-end overflow-hidden relative ${card.cardClass}`}
     >
       <LoopVideo
         name={card.video}
         videoRef={videoRef}
+        load={load}
         fadeColor={card.fadeColor}
         className={`transition-opacity duration-700 group-hover:opacity-70 ${card.videoClass}`}
       />

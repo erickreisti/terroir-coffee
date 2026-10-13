@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { Fragment, useRef, useEffect, useState } from "react";
 import { m, useInView } from "framer-motion";
 
 /* ─────────────────────────────────────────────
@@ -182,38 +182,47 @@ function SplitText({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+  const words = text.split(" ");
+  // Índice da primeira letra de cada palavra no texto (conta os espaços, como antes)
+  const offsets = words.map((_, w) => words.slice(0, w).join(" ").length + (w > 0 ? 1 : 0));
 
   return (
     <span ref={ref} className={`inline ${className}`}>
       <span className="sr-only">{text}</span>
-      {text.split("").map((char, i) => (
-        <m.span
-          key={i}
-          aria-hidden="true"
-          className="inline-block"
-          style={{ whiteSpace: char === " " ? "pre" : undefined }}
-          initial={{
-            opacity: 0,
-            transform:
-              "perspective(500px) translate3d(-25px, -30px, -120px) rotate3d(1, -1, 0, 30deg)",
-          }}
-          animate={
-            inView
-              ? {
-                opacity: 1,
-                transform:
-                  "perspective(500px) translate3d(0, 0, 0) rotate3d(0, 0, 0, 0deg)",
-              }
-              : {}
-          }
-          transition={{
-            duration: 0.6,
-            delay: baseDelay + i * (charDelay / 1000),
-            ease: [0.215, 0.61, 0.355, 1],
-          }}
-        >
-          {char === " " ? "\u00A0" : char}
-        </m.span>
+      {/* Letras agrupadas por palavra: a linha só quebra entre palavras, nunca no meio de uma */}
+      {words.map((word, w) => (
+        <Fragment key={w}>
+          {w > 0 && " "}
+          <span aria-hidden="true" className="inline-block whitespace-nowrap">
+            {word.split("").map((char, c) => (
+              <m.span
+                key={c}
+                className="inline-block"
+                initial={{
+                  opacity: 0,
+                  transform:
+                    "perspective(500px) translate3d(-25px, -30px, -120px) rotate3d(1, -1, 0, 30deg)",
+                }}
+                animate={
+                  inView
+                    ? {
+                      opacity: 1,
+                      transform:
+                        "perspective(500px) translate3d(0, 0, 0) rotate3d(0, 0, 0, 0deg)",
+                    }
+                    : {}
+                }
+                transition={{
+                  duration: 0.6,
+                  delay: baseDelay + (offsets[w] + c) * (charDelay / 1000),
+                  ease: [0.215, 0.61, 0.355, 1],
+                }}
+              >
+                {char}
+              </m.span>
+            ))}
+          </span>
+        </Fragment>
       ))}
     </span>
   );
@@ -243,7 +252,7 @@ function BigRevealCard({
 
   return (
     <div ref={ref} className="w-full">
-      <h3 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 whitespace-nowrap">
+      <h3 className="font-serif text-3xl md:text-4xl lg:text-[clamp(1.875rem,2.6vw,3rem)] font-bold text-white leading-tight mb-4">
         <SplitText
           text={title}
           baseDelay={inView ? titleDelay : 999}
@@ -268,6 +277,19 @@ function BigRevealCard({
       </m.p>
     </div>
   );
+}
+
+// true a partir do breakpoint lg (no servidor e no primeiro render, false)
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return isDesktop;
 }
 
 /* ─────────────────────────────────────────────
@@ -300,19 +322,30 @@ function ParallaxBlock({
   // senão as três baixam junto com o hero e atrasam o LCP
   const nearView = useInView(blockRef, { once: true, margin: "100% 0px" });
   const [phase, setPhase] = useState<"center" | "settled">("center");
+  // No celular as colunas ficam empilhadas: sem o deslize lateral e com títulos menores
+  const isDesktop = useIsDesktop();
 
   useEffect(() => {
     if (inView) {
-      const t = setTimeout(() => setPhase("settled"), 2600);
+      // No celular o conteúdo de baixo também espera essa fase, então ela chega mais cedo
+      const t = setTimeout(() => setPhase("settled"), isDesktop ? 2600 : 1500);
       return () => clearTimeout(t);
     }
-  }, [inView]);
+  }, [inView, isDesktop]);
+
+  // Os três tamanhos têm a mesma forma de clamp() para o framer-motion interpolar.
+  // No desktop o título assentado cabe na coluna sem invadir a do lado
+  const titleSize = isDesktop
+    ? { big: "clamp(3rem, 5.5vw, 5rem)", settled: "clamp(2rem, 3.6vw, 3.75rem)" }
+    : { big: "clamp(2.5rem, 11vw, 3.25rem)", settled: "clamp(2.25rem, 9vw, 2.75rem)" };
 
   const hasRight = !!rightContent && align === "left";
   const hasLeft = !!leftContent && align === "right";
 
-  const overlayStyle =
-    align === "left"
+  // No celular o texto ocupa a largura toda: overlay uniforme para manter o contraste
+  const overlayStyle = !isDesktop
+    ? "rgba(22, 11, 6, 0.82)"
+    : align === "left"
       ? "linear-gradient(to right, rgba(22,11,6,0.94) 40%, rgba(22,11,6,0.55) 100%)"
       : align === "right"
         ? "linear-gradient(to left, rgba(22,11,6,0.94) 40%, rgba(22,11,6,0.55) 100%)"
@@ -322,7 +355,7 @@ function ParallaxBlock({
     <div
       ref={blockRef}
       // bg-fixed só no desktop: no iOS/mobile o "fixed" é ignorado ou fica pesado
-      className="relative h-screen w-full flex items-center overflow-hidden bg-cover bg-center bg-no-repeat lg:bg-fixed"
+      className="relative min-h-screen lg:h-screen w-full flex flex-col lg:flex-row justify-center lg:justify-start lg:items-center gap-14 py-28 lg:py-0 overflow-hidden bg-cover bg-center bg-no-repeat lg:bg-fixed"
       style={{ backgroundImage: nearView ? `url(${bgImage})` : undefined }}
     >
       {/* Overlay */}
@@ -348,11 +381,10 @@ function ParallaxBlock({
 
       {/* Container de texto — começa centrado, desliza para a esquerda */}
       <m.div
-        className="relative z-10 flex flex-col gap-6 px-12 md:px-16 lg:px-20"
-        initial={{ x: "25vw" }}
-        animate={phase === "settled" ? { x: 0 } : { x: "25vw" }}
+        className={`relative z-10 flex flex-col gap-6 px-6 md:px-16 lg:px-20 w-full ${hasRight ? "lg:w-1/2" : "max-w-4xl"}`}
+        initial={false}
+        animate={{ x: phase === "settled" || !isDesktop ? 0 : "25vw" }}
         transition={{ duration: 1.3, ease: [0.76, 0, 0.24, 1] }}
-        style={{ width: hasRight ? "50%" : "100%", maxWidth: hasRight ? "50%" : "56rem" }}
       >
         {/* Label */}
         <SplitText
@@ -364,20 +396,20 @@ function ParallaxBlock({
 
         {/* Título — grande enquanto centrado */}
         <m.h2
-          className="font-serif font-bold leading-tight text-white drop-shadow-2xl whitespace-nowrap"
+          className="font-serif font-bold leading-tight text-white drop-shadow-2xl lg:whitespace-nowrap"
           animate={
             phase === "settled"
-              ? { fontSize: "clamp(2.5rem, 5vw, 4rem)", scale: 1 }
+              ? { fontSize: titleSize.settled, scale: 1 }
               : inView
                 ? {
-                  fontSize: "clamp(3rem, 7vw, 6rem)",
+                  fontSize: titleSize.big,
                   scale: [1, 1.015, 1],
                   transition: {
                     fontSize: { duration: 1.3, ease: [0.76, 0, 0.24, 1] },
                     scale: { duration: 2.2, repeat: Infinity, ease: "easeInOut" },
                   },
                 }
-                : { fontSize: "clamp(3rem, 7vw, 6rem)", scale: 1 }
+                : { fontSize: titleSize.big, scale: 1 }
           }
           transition={{ duration: 1.3, ease: [0.76, 0, 0.24, 1] }}
         >
@@ -398,7 +430,7 @@ function ParallaxBlock({
       {/* Lado esquerdo para align=right */}
       {hasLeft && (
         <m.div
-          className="relative z-10 w-1/2 px-12 md:px-16 lg:px-20 flex flex-col gap-10 items-end text-right"
+          className="relative z-10 w-full lg:w-1/2 px-6 md:px-16 lg:px-20 flex flex-col gap-10 lg:items-end lg:text-right"
           initial={{ opacity: 0, x: -40 }}
           animate={phase === "settled" ? { opacity: 1, x: 0 } : { opacity: 0, x: -40 }}
           transition={{ duration: 0.9, delay: 0.4 }}
@@ -410,7 +442,7 @@ function ParallaxBlock({
       {/* Lado direito para align=left */}
       {hasRight && (
         <m.div
-          className="relative z-10 w-1/2 px-12 md:px-16 lg:px-20 flex flex-col gap-10 items-start"
+          className="relative z-10 w-full lg:w-1/2 px-6 md:px-16 lg:px-20 flex flex-col gap-10 items-start"
           initial={{ opacity: 0, x: 40 }}
           animate={phase === "settled" ? { opacity: 1, x: 0 } : { opacity: 0, x: 40 }}
           transition={{ duration: 0.9, delay: 0.4 }}
@@ -490,7 +522,7 @@ export default function HistorySection() {
         particles="steam"
         ambientLight={true}
         leftContent={
-          <div className="flex flex-col gap-10 w-full items-end">
+          <div className="flex flex-col gap-10 w-full lg:items-end">
             <BigRevealCard
               title="Degustação Guiada"
               body="Cada visita começa com uma seleção curada de micro-lotes. Nossos especialistas conduzem sua percepção sensorial do aroma à finalização."

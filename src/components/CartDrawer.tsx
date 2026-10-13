@@ -80,14 +80,16 @@ export default function CartDrawer() {
                     <div className="flex items-center gap-3 bg-black/40 border border-white/10 rounded-full px-2 py-1">
                       <button 
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="text-white/50 hover:text-coffee-caramel transition-colors p-1"
+                        aria-label={`Diminuir quantidade de ${item.name}`}
+                        className="text-white/60 hover:text-coffee-caramel transition-colors p-2"
                       >
                         <LuMinus className="w-3 h-3" />
                       </button>
                       <span className="text-xs font-bold w-4 text-center text-white/90">{item.quantity}</span>
                       <button 
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="text-white/50 hover:text-coffee-caramel transition-colors p-1"
+                        aria-label={`Aumentar quantidade de ${item.name}`}
+                        className="text-white/60 hover:text-coffee-caramel transition-colors p-2"
                       >
                         <LuPlus className="w-3 h-3" />
                       </button>

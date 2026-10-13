@@ -58,13 +58,13 @@ export default function Header() {
         {/* Actions */}
         <div className="flex items-center gap-6 text-white">
           <button 
-            className="hover:text-coffee-caramel transition-transform hover:scale-110 duration-300 relative group" 
+            className="p-2 -m-2 hover:text-coffee-caramel transition-transform hover:scale-110 duration-300 relative group"
             aria-label="Carrinho"
             onClick={openCart}
           >
             <LuShoppingBag className="w-5 h-5 stroke-[1.5]" />
             {itemCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-coffee-copper text-white text-[10px] font-bold flex items-center justify-center rounded-full shadow-lg border border-coffee-dark/50 group-hover:bg-white group-hover:text-coffee-copper transition-colors">
+              <span className="absolute top-0.5 right-0 w-[18px] h-[18px] bg-coffee-copper text-white text-[10px] font-bold flex items-center justify-center rounded-full shadow-lg border border-coffee-dark/50 group-hover:bg-white group-hover:text-coffee-copper transition-colors">
                 {itemCount}
               </span>
             )}
@@ -72,7 +72,7 @@ export default function Header() {
 
           {/* Botão do menu mobile */}
           <button
-            className="md:hidden hover:text-coffee-caramel transition-colors"
+            className="md:hidden p-2 -m-2 hover:text-coffee-caramel transition-colors"
             aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"

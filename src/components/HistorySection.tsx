@@ -1,25 +1,21 @@
 "use client";
 
 import { Fragment, useRef, useEffect, useState } from "react";
-import { m, useInView } from "framer-motion";
+import { m, useInView, useReducedMotion } from "framer-motion";
 
 /* ─────────────────────────────────────────────
    SVG: Folha
 ───────────────────────────────────────────── */
-function LeafSvg({ size = 24, color = "#a0b070" }: { size?: number; color?: string }) {
+function LeafSvg({ size = 24, color = "#7d9455" }: { size?: number; color?: string }) {
+  // Folha de café: alongada, ponta fina, nervura central e laterais
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <svg width={size * 0.55} height={size} viewBox="0 0 22 40" fill="none">
+      <path d="M11 1C4 9 1.5 18 3 27c1.2 7 4.6 11 8 12 3.4-1 6.8-5 8-12 1.5-9-1-18-8-26z" fill={color} />
       <path
-        d="M12 2C8 2 3 7 3 13c0 4.5 3.5 8 9 9 5.5-1 9-4.5 9-9 0-6-5-11-9-11z"
-        fill={color}
-        fillOpacity={0.85}
-      />
-      <path
-        d="M12 2 Q11 8 12 22"
-        stroke={color}
-        strokeWidth={1}
-        strokeOpacity={0.5}
-        fill="none"
+        d="M11 3v35M11 12l-4.5-3.5M11 12l4.5-3.5M11 19l-6-4M11 19l6-4M11 26l-6-4M11 26l6-4M11 32l-4-3M11 32l4-3"
+        stroke="rgba(22,11,6,0.35)"
+        strokeWidth={0.8}
+        strokeLinecap="round"
       />
     </svg>
   );
@@ -28,17 +24,19 @@ function LeafSvg({ size = 24, color = "#a0b070" }: { size?: number; color?: stri
 /* ─────────────────────────────────────────────
    SVG: Grão de Café
 ───────────────────────────────────────────── */
-function BeanSvg({ size = 20, color = "#b87333" }: { size?: number; color?: string }) {
+function BeanSvg({ size = 20 }: { size?: number }) {
+  // Grão torrado: marrom escuro com volume, fenda em "S" e um brilho discreto
   return (
-    <svg width={size} height={size * 1.5} viewBox="0 0 14 20" fill="none">
-      <ellipse cx="7" cy="10" rx="6" ry="9" fill={color} fillOpacity={0.9} />
+    <svg width={size * 0.72} height={size} viewBox="0 0 18 25" fill="none">
+      <ellipse cx="9" cy="12.5" rx="8" ry="11.5" fill="#5a3320" />
+      <ellipse cx="7" cy="9.5" rx="4.5" ry="6.5" fill="#7a4a2c" fillOpacity={0.7} />
       <path
-        d="M7 2 Q3 7 4 10 Q5 13 7 18"
-        stroke="rgba(0,0,0,0.35)"
-        strokeWidth={1.2}
-        fill="none"
+        d="M9.5 2.5C6.5 6 11.5 9 9 12.5S7.5 19 9.5 22.5"
+        stroke="#24130a"
+        strokeWidth={1.6}
         strokeLinecap="round"
       />
+      <ellipse cx="5.5" cy="7" rx="1.4" ry="2.4" fill="#f0c48f" fillOpacity={0.25} />
     </svg>
   );
 }
@@ -71,72 +69,80 @@ const BEAN_CONFIGS = [
   { delay: 3.0, duration: 5.6, size: 80, rot: 55, top: "-14%", right: "36%" },
 ];
 
+// Ritmo de fundo: lento o bastante para não competir com o texto
+const PARTICLE_SLOWDOWN = 2.2;
+
 function FloatingParticles({
   type,
-  visible,
+  active,
+  compact,
 }: {
   type: "leaves" | "beans" | "steam";
-  visible: boolean;
+  active: boolean;
+  compact: boolean;
 }) {
-  const configs = type === "leaves" ? LEAF_CONFIGS : type === "beans" ? BEAN_CONFIGS : STEAM_CONFIGS;
+  const all = type === "leaves" ? LEAF_CONFIGS : type === "beans" ? BEAN_CONFIGS : STEAM_CONFIGS;
+  // No celular, metade das partículas e menores: a tela é estreita e o texto ocupa tudo
+  const configs = compact ? all.slice(0, 5) : all;
+  // Grãos de verdade são pequenos: em tamanho de folha viram manchas
+  // Vapor é o contrário: nuvens grandes e difusas, senão parecem bolinhas de luz
+  const scale =
+    type === "beans" ? (compact ? 0.3 : 0.42) : type === "steam" ? (compact ? 1.1 : 1.8) : compact ? 0.45 : 0.7;
 
   return (
-    <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
+    // Atrás do texto (z-10): passam pelo fundo sem cobrir nenhuma letra
+    <div aria-hidden="true" className="absolute inset-0 z-5 pointer-events-none overflow-hidden">
       {configs.map((cfg, i) => {
         const leafBean = cfg as typeof LEAF_CONFIGS[0];
         const steam = cfg as typeof STEAM_CONFIGS[0];
+        const size = Math.round(cfg.size * scale);
         return (
           <m.div
             key={i}
-            className="absolute"
+            className="absolute will-change-transform"
             style={
               type === "steam"
-                ? {
-                  bottom: "-10%",
-                  left: steam.left,
-                  filter: "blur(8px)",
-                }
-                : {
-                  top: leafBean.top,
-                  right: leafBean.right,
-                }
+                ? { bottom: "-10%", left: steam.left, filter: "blur(16px)" }
+                // As maiores ficam desfocadas: parecem mais perto da câmera e dão profundidade
+                : { top: leafBean.top, right: leafBean.right, filter: cfg.size >= 100 ? "blur(3px)" : undefined }
             }
+            initial={{ opacity: 0 }}
             animate={
-              visible
-                ? type === "steam"
+              !active
+                ? { opacity: 0 }
+                : type === "steam"
                   ? {
-                    y: [0, -(typeof window !== "undefined" ? window.innerHeight * 1.2 : 900)],
+                    y: ["0vh", "-120vh"],
                     x: [0, steam.dx],
-                    scale: [0.6, 1.8],
-                    opacity: [0, 0.6, 0.4, 0],
+                    scale: [0.7, 1.6],
+                    opacity: [0, 0.5, 0.3, 0],
                   }
                   : {
-                    x: [0, -(typeof window !== "undefined" ? window.innerWidth * 1.15 : 1600)],
-                    y: [0, typeof window !== "undefined" ? window.innerHeight * 1.1 : 800],
+                    x: ["0vw", "-115vw"],
+                    y: ["0vh", "110vh"],
                     rotate: [leafBean.rot, leafBean.rot + 360],
-                    opacity: [0, 1, 1, 0.8],
+                    opacity: type === "beans" ? [0, 0.85, 0.85, 0] : [0, 0.55, 0.55, 0],
                   }
-                : { opacity: 0 }
             }
             transition={
-              visible
+              active
                 ? {
-                  duration: cfg.duration,
+                  duration: cfg.duration * PARTICLE_SLOWDOWN,
                   delay: cfg.delay,
                   repeat: Infinity,
                   ease: type === "steam" ? "easeOut" : "linear",
-                  times: [0, 0.05, 0.9, 1],
+                  times: [0, 0.08, 0.85, 1],
                 }
-                : { duration: 1.2 }
+                : { duration: 0.6 }
             }
           >
             {type === "leaves" ? (
-            <LeafSvg size={cfg.size} />
-          ) : type === "beans" ? (
-            <BeanSvg size={cfg.size} />
-          ) : (
-            <SteamSvg size={cfg.size} />
-          )}
+              <LeafSvg size={size} />
+            ) : type === "beans" ? (
+              <BeanSvg size={size} />
+            ) : (
+              <SteamSvg size={size} />
+            )}
           </m.div>
         );
       })}
@@ -148,10 +154,17 @@ function FloatingParticles({
    SVG: Vapor / Fumaça
 ───────────────────────────────────────────── */
 function SteamSvg({ size = 40 }: { size?: number }) {
+  // Nuvem de vapor com borda que se dissolve (gradiente radial) em vez de elipse chapada
   return (
     <svg width={size} height={size * 1.5} viewBox="0 0 40 60" fill="none">
-      <ellipse cx="20" cy="30" rx="14" ry="22" fill="white" fillOpacity={0.12} />
-      <ellipse cx="20" cy="30" rx="8" ry="14" fill="white" fillOpacity={0.08} />
+      <defs>
+        <radialGradient id="steam-puff">
+          <stop offset="0%" stopColor="#fff" stopOpacity={0.55} />
+          <stop offset="60%" stopColor="#fff" stopOpacity={0.18} />
+          <stop offset="100%" stopColor="#fff" stopOpacity={0} />
+        </radialGradient>
+      </defs>
+      <ellipse cx="20" cy="30" rx="20" ry="30" fill="url(#steam-puff)" />
     </svg>
   );
 }
@@ -174,14 +187,21 @@ function SplitText({
   className = "",
   baseDelay = 0,
   charDelay = 18,
+  start,
+  accentLast = false,
 }: {
   text: string;
   className?: string;
   baseDelay?: number;
   charDelay?: number;
+  // Quando informado, o pai decide quando animar (em vez de o próprio texto entrar na tela)
+  start?: boolean;
+  // Última palavra em itálico dourado, numa linha própria no desktop
+  accentLast?: boolean;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const selfInView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = start ?? selfInView;
   const words = text.split(" ");
   // Índice da primeira letra de cada palavra no texto (conta os espaços, como antes)
   const offsets = words.map((_, w) => words.slice(0, w).join(" ").length + (w > 0 ? 1 : 0));
@@ -193,29 +213,23 @@ function SplitText({
       {words.map((word, w) => (
         <Fragment key={w}>
           {w > 0 && " "}
-          <span aria-hidden="true" className="inline-block whitespace-nowrap">
+          <span
+            aria-hidden="true"
+            className={`inline-block whitespace-nowrap ${
+              accentLast && w === words.length - 1 ? "italic font-medium text-coffee-gold lg:block" : ""
+            }`}
+          >
             {word.split("").map((char, c) => (
               <m.span
                 key={c}
                 className="inline-block"
-                initial={{
-                  opacity: 0,
-                  transform:
-                    "perspective(500px) translate3d(-25px, -30px, -120px) rotate3d(1, -1, 0, 30deg)",
-                }}
-                animate={
-                  inView
-                    ? {
-                      opacity: 1,
-                      transform:
-                        "perspective(500px) translate3d(0, 0, 0) rotate3d(0, 0, 0, 0deg)",
-                    }
-                    : {}
-                }
+                // Só sobe e aparece: sem giro 3D nem escala, a letra nunca deforma
+                initial={{ opacity: 0, y: "0.45em" }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{
-                  duration: 0.6,
+                  duration: 0.7,
                   delay: baseDelay + (offsets[w] + c) * (charDelay / 1000),
-                  ease: [0.215, 0.61, 0.355, 1],
+                  ease: [0.22, 1, 0.36, 1],
                 }}
               >
                 {char}
@@ -236,39 +250,35 @@ function BigRevealCard({
   body,
   titleDelay = 0,
   bodyDelay = 0.6,
-  scrollReveal = false,
+  show,
 }: {
   title: string;
   body: string;
   titleDelay?: number;
   bodyDelay?: number;
-  scrollReveal?: boolean;
+  // Quando informado, o pai decide quando revelar (desktop, em sequência automática)
+  show?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, {
-    once: true,
-    margin: scrollReveal ? "0px 0px -30% 0px" : "0px 0px -5% 0px",
-  });
+  const selfInView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
+  const inView = show ?? selfInView;
 
   return (
-    <div ref={ref} className="w-full">
-      <h3 className="font-serif text-3xl md:text-4xl lg:text-[clamp(1.875rem,2.6vw,3rem)] font-bold text-white leading-tight mb-4">
-        <SplitText
-          text={title}
-          baseDelay={inView ? titleDelay : 999}
-          charDelay={20}
-        />
-      </h3>
-
+    <div ref={ref} className="relative w-full py-7 last:pb-0">
+      {/* Fio dourado acima de cada tópico */}
       <m.div
-        className="h-px bg-coffee-caramel/50 mb-5"
+        className="absolute top-0 inset-x-0 h-px bg-coffee-gold/35"
         initial={{ scaleX: 0, originX: 0 }}
         animate={inView ? { scaleX: 1 } : {}}
-        transition={{ duration: 0.8, delay: titleDelay + 0.2 }}
+        transition={{ duration: 0.8, delay: titleDelay }}
       />
 
+      <h3 className="font-serif text-2xl lg:text-[1.625rem] font-semibold text-white leading-snug mb-3">
+        <SplitText text={title} start={inView} baseDelay={titleDelay} charDelay={20} />
+      </h3>
+
       <m.p
-        className="text-base md:text-lg text-white/85 leading-relaxed"
+        className="text-base text-white/85 leading-relaxed"
         initial={{ opacity: 0, y: 16 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, delay: bodyDelay }}
@@ -300,9 +310,7 @@ function ParallaxBlock({
   label,
   title,
   paragraph,
-  align = "center",
-  rightContent,
-  leftContent,
+  cards,
   particles,
   ambientLight,
 }: {
@@ -310,52 +318,47 @@ function ParallaxBlock({
   label: string;
   title: string;
   paragraph: string;
-  align?: "center" | "left" | "right";
-  rightContent?: React.ReactNode;
-  leftContent?: React.ReactNode;
+  cards: { title: string; body: string }[];
   particles?: "leaves" | "beans" | "steam";
   ambientLight?: boolean;
 }) {
   const blockRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(blockRef, { once: true, margin: "-15%" });
+  const inView = useInView(blockRef, { once: true, amount: 0.35 });
   // background-image não tem loading="lazy": só aplica a imagem a uma tela de distância,
   // senão as três baixam junto com o hero e atrasam o LCP
   const nearView = useInView(blockRef, { once: true, margin: "100% 0px" });
-  const [phase, setPhase] = useState<"center" | "settled">("center");
   // No celular as colunas ficam empilhadas: sem o deslize lateral e com títulos menores
   const isDesktop = useIsDesktop();
+  // Partículas só rodam com o capítulo na tela (fora dela ficam paradas, sem gastar CPU)
+  const onScreen = useInView(blockRef, { amount: 0.1 });
+  const reduceMotion = useReducedMotion();
 
+  // Etapas do capítulo: 0 = só o título, 1 = assentado com parágrafo, 2+ = cada tópico.
+  // Tudo entra sozinho, em sequência curta, logo que o capítulo aparece: quem rola rápido
+  // já vê o conteúdo chegando. No celular os tópicos entram pela rolagem (ficam empilhados abaixo)
+  const [step, setStep] = useState(0);
   useEffect(() => {
-    if (inView) {
-      // No celular o conteúdo de baixo também espera essa fase, então ela chega mais cedo
-      const t = setTimeout(() => setPhase("settled"), isDesktop ? 2600 : 1500);
-      return () => clearTimeout(t);
-    }
+    if (!inView) return;
+    const settle = isDesktop ? 1100 : 500;
+    const timers = [settle, settle + 450, settle + 850].map((ms, i) =>
+      setTimeout(() => setStep((prev) => Math.max(prev, i + 1)), ms),
+    );
+    return () => timers.forEach(clearTimeout);
   }, [inView, isDesktop]);
 
-  // Os três tamanhos têm a mesma forma de clamp() para o framer-motion interpolar.
-  // No desktop o título assentado cabe na coluna sem invadir a do lado
-  const titleSize = isDesktop
-    ? { big: "clamp(3rem, 5.5vw, 5rem)", settled: "clamp(2rem, 3.6vw, 3.75rem)" }
-    : { big: "clamp(2.5rem, 11vw, 3.25rem)", settled: "clamp(2.25rem, 9vw, 2.75rem)" };
+  const phase = step >= 1 ? "settled" : "center";
 
-  const hasRight = !!rightContent && align === "left";
-  const hasLeft = !!leftContent && align === "right";
-
-  // No celular o texto ocupa a largura toda: overlay uniforme para manter o contraste
-  const overlayStyle = !isDesktop
-    ? "rgba(22, 11, 6, 0.82)"
-    : align === "left"
-      ? "linear-gradient(to right, rgba(22,11,6,0.94) 40%, rgba(22,11,6,0.55) 100%)"
-      : align === "right"
-        ? "linear-gradient(to left, rgba(22,11,6,0.94) 40%, rgba(22,11,6,0.55) 100%)"
-        : "rgba(22, 11, 6, 0.72)";
+  // Desktop: a foto aparece em cima e escurece só embaixo, onde fica o texto.
+  // No celular o texto ocupa a tela toda: overlay uniforme para manter o contraste
+  const overlayStyle = isDesktop
+    ? "linear-gradient(to top, rgba(22,11,6,0.96) 0%, rgba(22,11,6,0.7) 45%, rgba(22,11,6,0.25) 100%)"
+    : "rgba(22, 11, 6, 0.82)";
 
   return (
     <div
       ref={blockRef}
       // bg-fixed só no desktop: no iOS/mobile o "fixed" é ignorado ou fica pesado
-      className="relative min-h-screen lg:h-screen w-full flex flex-col lg:flex-row justify-center lg:justify-start lg:items-center gap-14 py-28 lg:py-0 overflow-hidden bg-cover bg-center bg-no-repeat lg:bg-fixed"
+      className="relative min-h-screen w-full flex flex-col lg:flex-row justify-center lg:justify-between lg:items-end gap-14 py-28 lg:pt-0 lg:pb-24 overflow-hidden bg-cover bg-center bg-no-repeat lg:bg-fixed"
       style={{ backgroundImage: nearView ? `url(${bgImage})` : undefined }}
     >
       {/* Overlay */}
@@ -375,81 +378,66 @@ function ParallaxBlock({
       )}
 
       {/* Partículas flutuantes */}
-      {particles && (
-        <FloatingParticles type={particles} visible={inView && phase === "center"} />
+      {particles && !reduceMotion && (
+        <FloatingParticles type={particles} active={inView && onScreen} compact={!isDesktop} />
       )}
 
       {/* Container de texto — começa centrado, desliza para a esquerda */}
       <m.div
-        className={`relative z-10 flex flex-col gap-6 px-6 md:px-16 lg:px-20 w-full ${hasRight ? "lg:w-1/2" : "max-w-4xl"}`}
+        className={`relative z-10 flex flex-col gap-6 lg:gap-7 px-6 md:px-16 lg:px-20 w-full lg:w-7/12`}
         initial={false}
-        animate={{ x: phase === "settled" || !isDesktop ? 0 : "25vw" }}
+        animate={{ x: phase === "settled" || !isDesktop ? 0 : "20vw" }}
         transition={{ duration: 1.3, ease: [0.76, 0, 0.24, 1] }}
       >
-        {/* Label */}
-        <SplitText
-          text={label}
-          className="text-coffee-gold tracking-[0.25em] text-xs uppercase font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
-          baseDelay={inView ? 0 : 999}
-          charDelay={22}
-        />
+        {/* Label com fio dourado */}
+        <div className="flex items-center gap-4">
+          <m.span
+            aria-hidden="true"
+            className="block w-12 h-px bg-coffee-gold"
+            initial={{ scaleX: 0, originX: 0 }}
+            animate={inView ? { scaleX: 1 } : {}}
+            transition={{ duration: 0.8 }}
+          />
+          <SplitText
+            text={label}
+            className="text-coffee-gold tracking-[0.25em] text-xs uppercase font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
+            start={inView}
+            baseDelay={0.2}
+            charDelay={22}
+          />
+        </div>
 
-        {/* Título — grande enquanto centrado */}
-        <m.h2
-          className="font-serif font-bold leading-tight text-white drop-shadow-2xl lg:whitespace-nowrap"
-          animate={
-            phase === "settled"
-              ? { fontSize: titleSize.settled, scale: 1 }
-              : inView
-                ? {
-                  fontSize: titleSize.big,
-                  scale: [1, 1.015, 1],
-                  transition: {
-                    fontSize: { duration: 1.3, ease: [0.76, 0, 0.24, 1] },
-                    scale: { duration: 2.2, repeat: Infinity, ease: "easeInOut" },
-                  },
-                }
-                : { fontSize: titleSize.big, scale: 1 }
-          }
-          transition={{ duration: 1.3, ease: [0.76, 0, 0.24, 1] }}
-        >
-          <SplitText text={title} baseDelay={inView ? 0.15 : 999} charDelay={25} />
-        </m.h2>
+        {/* Título — última palavra em itálico dourado */}
+        {/* Tamanho fixo: animar fontSize recalcula o texto a cada frame e as letras tremem */}
+        <h2 className="font-serif font-bold leading-[1.02] tracking-[-0.01em] text-white drop-shadow-2xl lg:whitespace-nowrap text-[clamp(2.25rem,9vw,2.75rem)] lg:text-[clamp(3rem,6.1vw,5.5rem)]">
+          <SplitText text={title} start={inView} baseDelay={0.15} charDelay={25} accentLast />
+        </h2>
 
         {/* Parágrafo — só aparece após o slide */}
         <m.p
-          className="text-lg md:text-xl text-white/80 leading-relaxed max-w-md"
+          className="text-lg md:text-xl text-white/85 leading-relaxed max-w-lg"
           initial={{ opacity: 0, y: 12 }}
           animate={phase === "settled" ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-          transition={{ duration: 0.9, delay: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.25 }}
         >
           {paragraph}
         </m.p>
       </m.div>
 
-      {/* Lado esquerdo para align=right */}
-      {hasLeft && (
-        <m.div
-          className="relative z-10 w-full lg:w-1/2 px-6 md:px-16 lg:px-20 flex flex-col gap-10 lg:items-end lg:text-right"
-          initial={{ opacity: 0, x: -40 }}
-          animate={phase === "settled" ? { opacity: 1, x: 0 } : { opacity: 0, x: -40 }}
-          transition={{ duration: 0.9, delay: 0.4 }}
-        >
-          {leftContent}
-        </m.div>
-      )}
+      {/* Coluna estreita de tópicos, alinhada à base junto com o título */}
+      <div className="relative z-10 w-full lg:w-4/12 px-6 md:px-16 lg:pl-0 lg:pr-20 flex flex-col">
+        {cards.map((card, i) => (
+          <BigRevealCard
+            key={card.title}
+            title={card.title}
+            body={card.body}
+            titleDelay={0.1}
+            bodyDelay={0.5}
+            show={isDesktop ? step >= 2 + i : undefined}
+          />
+        ))}
+      </div>
 
-      {/* Lado direito para align=left */}
-      {hasRight && (
-        <m.div
-          className="relative z-10 w-full lg:w-1/2 px-6 md:px-16 lg:px-20 flex flex-col gap-10 items-start"
-          initial={{ opacity: 0, x: 40 }}
-          animate={phase === "settled" ? { opacity: 1, x: 0 } : { opacity: 0, x: 40 }}
-          transition={{ duration: 0.9, delay: 0.4 }}
-        >
-          {rightContent}
-        </m.div>
-      )}
     </div>
   );
 }
@@ -463,81 +451,57 @@ export default function HistorySection() {
 
       <ParallaxBlock
         bgImage="/images/coffee_farm.webp"
-        label="Capítulo 1 — A Origem"
+        label="A Origem"
         title="Nascido nas Montanhas"
         paragraph="A verdadeira identidade de um café reside no seu terroir — no solo vulcânico, na altitude e na névoa que abraça os grãos ao amanhecer."
-        align="left"
         particles="leaves"
-        rightContent={
-          <div className="flex flex-col gap-14 w-full">
-            <BigRevealCard
-              title="O Solo que Faz a Diferença"
-              body="Percorremos as montanhas de Minas Gerais, as altitudes da Colômbia e os planaltos etíopes. Cada região, cada fazenda, carrega uma assinatura única e irrepetível. É isso que chamamos de terroir."
-              titleDelay={0.2}
-              bodyDelay={0.8}
-            />
-            <BigRevealCard
-              title="Micro-Lotes Raros"
-              body="Selecionamos apenas os micro-lotes de maior pontuação sensorial — aqueles que nenhum supermercado terá acesso. Cafés raros, com produção limitada e histórias para contar."
-              titleDelay={0.1}
-              bodyDelay={0.7}
-              scrollReveal={true}
-            />
-          </div>
-        }
+        cards={[
+          {
+            title: "O Solo que Faz a Diferença",
+            body: "Percorremos as montanhas de Minas Gerais, as altitudes da Colômbia e os planaltos etíopes. Cada região, cada fazenda, carrega uma assinatura única e irrepetível. É isso que chamamos de terroir.",
+          },
+          {
+            title: "Micro-Lotes Raros",
+            body: "Selecionamos apenas os micro-lotes de maior pontuação sensorial — aqueles que nenhum supermercado terá acesso. Cafés raros, com produção limitada e histórias para contar.",
+          },
+        ]}
       />
 
       <ParallaxBlock
         bgImage="/images/founders.webp"
-        label="Capítulo 2 — Os Mestres"
+        label="Os Mestres"
         title="Artesãos da Torra"
         paragraph="Nossa busca pela xícara perfeita nos levou a dedicar vidas inteiras ao estudo da curva de torra. Cada grão, uma decisão. Sem automação. Sem atalhos."
-        align="left"
         particles="beans"
-        rightContent={
-          <div className="flex flex-col gap-14 w-full">
-            <BigRevealCard
-              title="A Arte da Torra"
-              body="A curva de torra é a nossa linguagem. Controlamos temperatura, tempo e desenvolvimento com precisão cirúrgica — transformando um grão comum em uma obra-prima sensorial."
-              titleDelay={0.2}
-              bodyDelay={0.8}
-            />
-            <BigRevealCard
-              title="Nossa Filosofia"
-              body="Acreditamos que um café excepcional não precisa de nada além de si mesmo. Apenas as notas florais, frutadas e achocolatadas que a natureza inscreveu no grão."
-              titleDelay={0.1}
-              bodyDelay={0.7}
-              scrollReveal={true}
-            />
-          </div>
-        }
+        cards={[
+          {
+            title: "A Arte da Torra",
+            body: "A curva de torra é a nossa linguagem. Controlamos temperatura, tempo e desenvolvimento com precisão cirúrgica — transformando um grão comum em uma obra-prima sensorial.",
+          },
+          {
+            title: "Nossa Filosofia",
+            body: "Acreditamos que um café excepcional não precisa de nada além de si mesmo. Apenas as notas florais, frutadas e achocolatadas que a natureza inscreveu no grão.",
+          },
+        ]}
       />
 
       <ParallaxBlock
         bgImage="/images/store.webp"
-        label="Capítulo 3 — O Santuário"
+        label="O Santuário"
         title="Nossa Boutique"
         paragraph="Um espaço criado para celebrar o café como ele deve ser: sem pressa, sem distrações, com atenção total ao que está na xícara."
-        align="right"
         particles="steam"
         ambientLight={true}
-        leftContent={
-          <div className="flex flex-col gap-10 w-full lg:items-end">
-            <BigRevealCard
-              title="Degustação Guiada"
-              body="Cada visita começa com uma seleção curada de micro-lotes. Nossos especialistas conduzem sua percepção sensorial do aroma à finalização."
-              titleDelay={0.2}
-              bodyDelay={0.8}
-            />
-            <BigRevealCard
-              title="Moagem na Hora"
-              body="O café é moído no momento do pedido. Nunca um segundo antes. O aroma que enche a loja é a nossa maior promessa cumprida."
-              titleDelay={0.1}
-              bodyDelay={0.7}
-              scrollReveal={true}
-            />
-          </div>
-        }
+        cards={[
+          {
+            title: "Degustação Guiada",
+            body: "Cada visita começa com uma seleção curada de micro-lotes. Nossos especialistas conduzem sua percepção sensorial do aroma à finalização.",
+          },
+          {
+            title: "Moagem na Hora",
+            body: "O café é moído no momento do pedido. Nunca um segundo antes. O aroma que enche a loja é a nossa maior promessa cumprida.",
+          },
+        ]}
       />
 
     </section>

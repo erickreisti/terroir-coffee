@@ -320,14 +320,15 @@ export default function Showcase() {
                     {product.category}
                   </div>
                   
-                  {/* Hover Overlay Button */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button 
+                  {/* Botão de adicionar: no celular fica sempre visível no canto (não há hover);
+                      no desktop aparece no hover ou quando recebe foco pelo teclado */}
+                  <div className="absolute inset-0 flex items-end justify-end p-4 md:p-0 md:items-center md:justify-center md:bg-black/40 md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100 transition-opacity">
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAddProduct(product);
                       }}
-                      className="bg-coffee-copper text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-xl"
+                      className="bg-coffee-copper hover:bg-coffee-accent text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 transform md:translate-y-4 md:group-hover:translate-y-0 md:group-focus-within:translate-y-0 transition-all duration-300 shadow-xl"
                     >
                       <LuShoppingBag className="w-4 h-4" />
                       Adicionar

@@ -3,6 +3,9 @@
 @theme {
   --color-coffee-dark: #2c1a12;
   --color-coffee-caramel: #b87333;
+  /* Variações com contraste AA: texto pequeno sobre fundo escuro / fundo de botão com texto branco */
+  --color-coffee-amber: #c47e3c;
+  --color-coffee-copper: #a0622a;
   --color-coffee-cream: #f9f6f0;
   --color-coffee-accent: #8b4513;
   --color-coffee-earth: #4a3728;
@@ -17,4 +20,44 @@
     background-color: var(--color-coffee-cream);
     color: var(--color-coffee-dark);
   }
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@layer utilities {
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.15) transparent;
+  }
+}
+
+/* Compensa o header fixo ao navegar por âncoras */
+section[id] {
+  scroll-margin-top: 4rem;
+}
+
+/* Textura de ruído: tile PNG pré-renderizado (o filtro SVG feTurbulence custava ~2s de raster no celular) */
+@utility bg-noise {
+  background-image: url("/images/noise.png");
+}
+
+/* Entrada do texto do hero em CSS puro: roda antes da hidratação, sem atrasar o LCP */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: none; }
+}
+
+@utility animate-fade-up {
+  animation: fade-up 0.8s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up { animation: none; }
 }

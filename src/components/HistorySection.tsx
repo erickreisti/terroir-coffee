@@ -184,7 +184,8 @@ function SplitText({
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <span ref={ref} className={`inline ${className}`} aria-label={text}>
+    <span ref={ref} className={`inline ${className}`}>
+      <span className="sr-only">{text}</span>
       {text.split("").map((char, i) => (
         <motion.span
           key={i}
@@ -317,14 +318,9 @@ function ParallaxBlock({
   return (
     <div
       ref={blockRef}
-      className="relative h-screen w-full flex items-center overflow-hidden"
-      style={{
-        backgroundImage: `url(${bgImage})`,
-        backgroundAttachment: "fixed",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
+      // bg-fixed só no desktop: no iOS/mobile o "fixed" é ignorado ou fica pesado
+      className="relative h-screen w-full flex items-center overflow-hidden bg-cover bg-center bg-no-repeat lg:bg-fixed"
+      style={{ backgroundImage: `url(${bgImage})` }}
     >
       {/* Overlay */}
       <div className="absolute inset-0 z-0" style={{ background: overlayStyle }} />
@@ -332,7 +328,7 @@ function ParallaxBlock({
       {/* Luz ambiente âmbar pulsante (apenas quando ambientLight=true) */}
       {ambientLight && (
         <motion.div
-          className="absolute inset-0 z-[1] pointer-events-none"
+          className="absolute inset-0 z-1 pointer-events-none"
           animate={{ opacity: [0.0, 0.18, 0.0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           style={{
@@ -431,7 +427,7 @@ export default function HistorySection() {
     <section id="historia" className="relative w-full text-white">
 
       <ParallaxBlock
-        bgImage="/images/coffee_farm.png"
+        bgImage="/images/coffee_farm.webp"
         label="Capítulo 1 — A Origem"
         title="Nascido nas Montanhas"
         paragraph="A verdadeira identidade de um café reside no seu terroir — no solo vulcânico, na altitude e na névoa que abraça os grãos ao amanhecer."
@@ -457,7 +453,7 @@ export default function HistorySection() {
       />
 
       <ParallaxBlock
-        bgImage="/images/founders.png"
+        bgImage="/images/founders.webp"
         label="Capítulo 2 — Os Mestres"
         title="Artesãos da Torra"
         paragraph="Nossa busca pela xícara perfeita nos levou a dedicar vidas inteiras ao estudo da curva de torra. Cada grão, uma decisão. Sem automação. Sem atalhos."
@@ -483,7 +479,7 @@ export default function HistorySection() {
       />
 
       <ParallaxBlock
-        bgImage="/images/store.png"
+        bgImage="/images/store.webp"
         label="Capítulo 3 — O Santuário"
         title="Nossa Boutique"
         paragraph="Um espaço criado para celebrar o café como ele deve ser: sem pressa, sem distrações, com atenção total ao que está na xícara."

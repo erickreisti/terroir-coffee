@@ -7,12 +7,15 @@ import { LuArrowLeft, LuCreditCard, LuLock, LuCircleCheck } from "react-icons/lu
 import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
-  const { items, total, clearCart } = useCart();
+  const { items, total, clearCart, isHydrated } = useCart();
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Se o carrinho estiver vazio, idealmente não deveria estar aqui, mas tratamos:
-  if (items.length === 0) {
+  // Espera o carrinho ser lido do localStorage antes de decidir
+  if (!isHydrated) return <div className="min-h-screen bg-[#0a0705]" />;
+
+  // Durante o processamento o carrinho é limpo antes do redirect; não mostrar o estado vazio
+  if (items.length === 0 && !isProcessing) {
     return (
       <div className="min-h-screen bg-[#0a0705] flex flex-col items-center justify-center text-white p-6">
         <h1 className="font-serif text-3xl mb-4">Seu carrinho está vazio.</h1>
@@ -62,7 +65,7 @@ export default function CheckoutPage() {
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-24">
           
           {/* Formulários (Esquerda) */}
-          <div className="w-full lg:w-3/5 space-y-12">
+          <form onSubmit={handleCheckout} className="w-full lg:w-3/5 space-y-12">
             
             {/* Seção 1: Identificação */}
             <section>
@@ -111,8 +114,8 @@ export default function CheckoutPage() {
                 Pagamento
               </h2>
               
-              <form onSubmit={handleCheckout} className="space-y-8">
-                <div className="bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-2xl p-6 md:p-8 backdrop-blur-md relative overflow-hidden">
+              <div className="space-y-8">
+                <div className="bg-linear-to-br from-white/10 to-white/5 border border-white/10 rounded-2xl p-6 md:p-8 backdrop-blur-md relative overflow-hidden">
                   {/* Decoração sutil do cartão */}
                   <div className="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(circle,rgba(184,115,51,0.15)_0%,transparent_70%)] rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl" />
                   
@@ -167,15 +170,15 @@ export default function CheckoutPage() {
                   )}
                   
                   {/* Brilho hover animado */}
-                  <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
+                  <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
                 </button>
-              </form>
+              </div>
             </section>
-          </div>
+          </form>
 
           {/* Resumo do Pedido (Direita) */}
           <div className="w-full lg:w-2/5">
-            <div className="sticky top-28 bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+            <div className="sticky top-28 bg-linear-to-b from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
               {/* Efeito de Poeira Âmbar Flocada no card */}
               <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(184,115,51,0.15)_0%,transparent_60%)] pointer-events-none" />
               

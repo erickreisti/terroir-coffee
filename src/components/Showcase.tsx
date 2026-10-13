@@ -3,6 +3,7 @@
 import { useRef, MouseEvent } from "react";
 import { LuArrowRight, LuCheck, LuStar, LuShoppingBag } from "react-icons/lu";
 import { motion, useInView, useMotionValue, useMotionTemplate } from "framer-motion";
+import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 
 const plans = [
@@ -50,29 +51,32 @@ const products = [
     id: "p1",
     name: "Moinho Manual Comandante C40",
     price: "R$ 2.450,00",
-    image: "/images/manual_grinder.png",
+    image: "/images/manual_grinder.webp",
     category: "Equipamentos",
   },
   {
     id: "p2",
     name: "Café Especial Mantiqueira (250g)",
     price: "R$ 55,00",
-    image: "/images/coffee_bag.png",
+    image: "/images/coffee_bag.webp",
     category: "Grãos",
   },
   {
     id: "p3",
     name: "Chaleira Pescoço de Ganso BDK",
     price: "R$ 320,00",
-    image: "/images/gooseneck_kettle.png",
+    image: "/images/gooseneck_kettle.webp",
     category: "Equipamentos",
   },
 ];
 
+type Plan = (typeof plans)[number];
+type Product = (typeof products)[number];
+
 /* ─────────────────────────────────────────────
    Componente do Card do Plano com Animações Premium
 ───────────────────────────────────────────── */
-function PlanCard({ plan, isPlansInView, handleSubscribe }: { plan: any, isPlansInView: boolean, handleSubscribe: (p: any) => void }) {
+function PlanCard({ plan, isPlansInView, handleSubscribe }: { plan: Plan, isPlansInView: boolean, handleSubscribe: (p: Plan) => void }) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -126,7 +130,7 @@ function PlanCard({ plan, isPlansInView, handleSubscribe }: { plan: any, isPlans
         <div className="absolute overflow-hidden -top-4 left-1/2 -translate-x-1/2 bg-coffee-caramel text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase shadow-lg shadow-coffee-caramel/20 whitespace-nowrap z-10">
           Mais Escolhido
           <motion.div
-            className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12"
+            className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent skew-x-12"
             variants={{
               hover: { translateX: "100%", transition: { duration: 0.8, ease: "easeInOut" } }
             }}
@@ -182,7 +186,7 @@ export default function Showcase() {
   const shopRef = useRef(null);
   const isShopInView = useInView(shopRef, { once: true, margin: "-100px" });
 
-  const handleSubscribe = (plan: any) => {
+  const handleSubscribe = (plan: Plan) => {
     addItem({
       id: plan.id,
       name: `Assinatura: ${plan.name}`,
@@ -191,7 +195,7 @@ export default function Showcase() {
     });
   };
 
-  const handleAddProduct = (product: any) => {
+  const handleAddProduct = (product: Product) => {
     addItem({
       id: product.id,
       name: product.name,
@@ -253,7 +257,7 @@ export default function Showcase() {
 
       {/* Produtos Avulsos */}
       <section id="loja" className="py-24 relative" ref={shopRef}>
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
         
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
@@ -305,10 +309,11 @@ export default function Showcase() {
                 className="group cursor-pointer flex flex-col"
               >
                 <div className="relative aspect-square overflow-hidden rounded-2xl mb-6 bg-[#1a120b] border border-white/5 group-hover:border-coffee-caramel/30 transition-colors">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={product.image}
                     alt={product.name}
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
                     className="object-cover w-full h-full opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
                   />
                   <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-medium tracking-wider uppercase text-white/90 border border-white/10">

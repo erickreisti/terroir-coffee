@@ -26,11 +26,12 @@ export default function CtaSection() {
     >
       {/* Background com Parallax */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0705] via-transparent to-[#0a0705] z-10"></div>
-        <div className="absolute inset-0 bg-black/60 z-[5]"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-[#0a0705] via-transparent to-[#0a0705] z-10"></div>
+        <div className="absolute inset-0 bg-black/60 z-5"></div>
         <motion.img 
-          src="/images/hero_bg.png" 
-          alt="Coffee texture" 
+          src="/images/hero_bg.webp" 
+          alt=""
+          loading="lazy"
           style={{ y: yBg }}
           className="absolute top-[-20%] left-0 w-full h-[160%] object-cover opacity-60 mix-blend-luminosity"
         />

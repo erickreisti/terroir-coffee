@@ -2,232 +2,152 @@
 
 import Link from 'next/link';
 import { LuArrowRight } from "react-icons/lu";
-import { useRef, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useRef, useState, type RefObject } from 'react';
 
-// Animações
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.1,
-    },
-  },
+type LoopVideoProps = {
+  name: string;
+  fadeColor: string;
+  className?: string;
+  videoRef?: RefObject<HTMLVideoElement | null>;
+  autoPlay?: boolean;
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { duration: 0.8 } 
-  },
-};
-
-export default function HeroSection() {
-  const mainVideoRef = useRef<HTMLVideoElement>(null);
-  const quizVideoRef = useRef<HTMLVideoElement>(null);
-  const lojaVideoRef = useRef<HTMLVideoElement>(null);
-  const [isVideoFading, setIsVideoFading] = useState(false);
-  const [isQuizFading, setIsQuizFading] = useState(false);
-  const [isLojaFading, setIsLojaFading] = useState(false);
-
-  // Estados de Carregamento para o Fade-In
-  const [isMainLoaded, setIsMainLoaded] = useState(false);
-  const [isQuizLoaded, setIsQuizLoaded] = useState(false);
-  const [isLojaLoaded, setIsLojaLoaded] = useState(false);
-
-  // Garantia de que o fade-in vai ocorrer mesmo se o vídeo já estiver em cache
-  useEffect(() => {
-    if (mainVideoRef.current && mainVideoRef.current.readyState >= 3) setIsMainLoaded(true);
-    if (quizVideoRef.current && quizVideoRef.current.readyState >= 3) setIsQuizLoaded(true);
-    if (lojaVideoRef.current && lojaVideoRef.current.readyState >= 3) setIsLojaLoaded(true);
-  }, []);
-
-  // Monitora o tempo do vídeo para criar um crossfade suave antes do loop (esconde o corte)
-  const handleTimeUpdate = () => {
-    if (mainVideoRef.current) {
-      const { currentTime, duration } = mainVideoRef.current;
-      if (duration - currentTime < 0.8) setIsVideoFading(true);
-      else if (currentTime < 1) setIsVideoFading(false);
-    }
-  };
-
-  const handleQuizTimeUpdate = () => {
-    if (quizVideoRef.current) {
-      const { currentTime, duration } = quizVideoRef.current;
-      if (duration - currentTime < 0.8) setIsQuizFading(true);
-      else if (currentTime < 1) setIsQuizFading(false);
-    }
-  };
-
-  const handleLojaTimeUpdate = () => {
-    if (lojaVideoRef.current) {
-      const { currentTime, duration } = lojaVideoRef.current;
-      if (duration - currentTime < 0.8) setIsLojaFading(true);
-      else if (currentTime < 1) setIsLojaFading(false);
-    }
-  };
+// Vídeo em loop com poster (aparece já no HTML, antes da hidratação)
+// e um fade para a cor de fundo pouco antes do corte do loop.
+function LoopVideo({ name, fadeColor, className = "", videoRef, autoPlay }: LoopVideoProps) {
+  const [isFading, setIsFading] = useState(false);
 
   return (
-    <section className="h-screen w-full bg-coffee-cream flex overflow-hidden">
-      {/* Container Integrado Edge-to-Edge (100% View) */}
-      <div className="w-full h-full flex flex-col lg:flex-row relative">
-        
-        {/* Bloco Esquerdo (Principal) */}
-        <div 
-          className="relative w-full lg:w-[75%] h-[60%] lg:h-full flex items-end p-8 md:p-16 lg:p-24 transition-all duration-700 overflow-hidden cursor-default group bg-[#0a0705]"
-        >
-          <div className="absolute inset-0 z-0">
-            {/* Background Video */}
-            <video 
-              ref={mainVideoRef}
-              autoPlay 
-              loop 
-              muted 
-              playsInline
-              preload="auto"
-              onCanPlay={() => setIsMainLoaded(true)}
-              onTimeUpdate={handleTimeUpdate}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-[2000ms] ease-out group-hover:scale-105 ${isMainLoaded ? 'opacity-100' : 'opacity-0'}`}
-            >
-              <source src="/videos/coffee.mp4" type="video/mp4" />
-              Seu navegador não suporta vídeos.
-            </video>
-            
-            {/* Camada de Fade Cinematográfico para o Loop */}
-            <div 
-              className={`absolute inset-0 bg-[#0a0705] transition-opacity duration-700 z-10 pointer-events-none ${
-                isVideoFading ? "opacity-100" : "opacity-0"
-              }`} 
-            />
-            
-            {/* Gradient Overlay & Cinematic Noise */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0705] via-black/40 to-black/10 z-10" />
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none z-20" />
-          </div>
+    <>
+      {/* No vídeo principal, o poster vira uma <img> de alta prioridade: é ela que conta
+          como LCP (pinta no primeiro paint), e o vídeo entra por cima quando carrega */}
+      {autoPlay && (
+        // No celular usa uma versão menor do poster (~40 KB em vez de ~75 KB)
+        <picture>
+          <source media="(max-width: 767px)" srcSet={`/images/poster-${name}-mobile.webp`} />
+          <img
+            src={`/images/poster-${name}.webp`}
+            alt=""
+            fetchPriority="high"
+            className={`absolute inset-0 w-full h-full object-cover ${className}`}
+          />
+        </picture>
+      )}
+      <video
+        ref={videoRef}
+        src={`/videos/${name}.mp4`}
+        // O vídeo principal já tem a <img> por baixo; poster só nos cards (evita baixar a versão desktop no celular)
+        poster={autoPlay ? undefined : `/images/poster-${name}.webp`}
+        autoPlay={autoPlay}
+        preload={autoPlay ? "auto" : "metadata"}
+        loop
+        muted
+        playsInline
+        onTimeUpdate={(e) => {
+          const { currentTime, duration } = e.currentTarget;
+          setIsFading(duration - currentTime < 0.8);
+        }}
+        className={`absolute inset-0 w-full h-full object-cover ${className}`}
+      />
+      <div
+        className={`absolute inset-0 z-1 pointer-events-none transition-opacity duration-700 ${isFading ? "opacity-100" : "opacity-0"}`}
+        style={{ backgroundColor: fadeColor }}
+      />
+    </>
+  );
+}
 
-          <motion.div 
-            className="relative z-10 text-coffee-cream max-w-4xl"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.span variants={itemVariants} className="text-coffee-caramel font-medium tracking-[0.3em] text-sm uppercase mb-6 block drop-shadow-md">
-              Curadoria Premium
-            </motion.span>
-            
-            <motion.h1 variants={itemVariants} className="font-serif text-5xl md:text-6xl lg:text-7xl font-normal leading-[1.1] mb-8 lg:mb-10 text-white/90 text-balance tracking-tight">
-              O ápice do <br/>
-              <span className="italic font-light text-coffee-cream">Terroir.</span>
-            </motion.h1>
-            
-            <motion.p variants={itemVariants} className="text-lg md:text-2xl text-white/80 leading-relaxed max-w-xl font-light">
-              Grãos raros. Torra impecável. Uma experiência sensorial exclusiva entregue na sua porta.
-            </motion.p>
-          </motion.div>
+const CARDS = [
+  {
+    href: "#quiz",
+    video: "coffee-perfil",
+    title: "Encontre Seu Terroir",
+    text: "Responda a duas breves perguntas e descubra o grão perfeito para a sua jornada sensorial.",
+    cta: "Iniciar Avaliação",
+    fadeColor: "#0a0705",
+    cardClass: "bg-linear-to-br from-[#120e0c] to-[#0a0705] border-b border-white/5",
+    videoClass: "opacity-30",
+    overlayClass: "from-[#0a0705] via-[#0a0705]/40",
+    iconClass: "bg-coffee-caramel",
+  },
+  {
+    href: "#loja",
+    video: "coffee-shop",
+    title: "Boutique Premium",
+    text: "Acessórios profissionais e pacotes avulsos escolhidos a dedo por nossos mestres de torra.",
+    cta: "Explorar Catálogo",
+    fadeColor: "#8c5422",
+    cardClass: "bg-linear-to-br from-[#B87333] to-[#8c5422]",
+    videoClass: "opacity-25",
+    overlayClass: "from-[#8c5422] via-[#8c5422]/20",
+    iconClass: "bg-coffee-dark",
+  },
+];
+
+function HeroCard({ card }: { card: (typeof CARDS)[number] }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  return (
+    <Link
+      href={card.href}
+      onMouseEnter={() => videoRef.current?.play().catch(() => {})}
+      onMouseLeave={() => videoRef.current?.pause()}
+      className={`group flex-1 text-white p-8 lg:p-12 flex flex-col justify-center lg:justify-end overflow-hidden relative ${card.cardClass}`}
+    >
+      <LoopVideo
+        name={card.video}
+        videoRef={videoRef}
+        fadeColor={card.fadeColor}
+        className={`transition-opacity duration-700 group-hover:opacity-70 ${card.videoClass}`}
+      />
+      <div className={`absolute inset-0 z-1 bg-linear-to-t to-transparent pointer-events-none ${card.overlayClass}`} />
+
+      <div className="relative z-10 mb-6">
+        <h2 className="font-serif text-2xl lg:text-3xl font-bold mb-2 lg:mb-3">{card.title}</h2>
+        <p className="text-white/85 text-sm lg:text-base leading-relaxed hidden md:block">{card.text}</p>
+      </div>
+
+      <div className="relative z-10 inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full border border-white/10 bg-white/10 backdrop-blur-sm font-medium transition-all duration-300 group-hover:bg-white/20 group-hover:border-white/40 w-fit shadow-lg">
+        {card.cta}
+        <div className={`rounded-full p-2 transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110 shadow-md ${card.iconClass}`}>
+          <LuArrowRight className="w-4 h-4" />
         </div>
+      </div>
+    </Link>
+  );
+}
 
-        {/* Blocos da Direita (Secundários) */}
-        <div className="w-full lg:w-[25%] h-[40%] lg:h-full flex flex-col bg-[#0a0705]">
-          
-          {/* Card Quiz */}
-          <Link 
-            href="#quiz"
-            onMouseEnter={() => quizVideoRef.current?.play()}
-            onMouseLeave={() => quizVideoRef.current?.pause()}
-            className="group flex-1 bg-gradient-to-br from-[#120e0c] to-[#0a0705] border-b border-white/5 text-coffee-cream p-8 lg:p-12 flex flex-col justify-center lg:justify-end transition-colors duration-700 overflow-hidden relative"
-          >
-            {/* Background Video Revelado no Hover */}
-            <video 
-              ref={quizVideoRef}
-              loop 
-              muted 
-              playsInline
-              preload="auto"
-              onCanPlay={() => setIsQuizLoaded(true)}
-              onTimeUpdate={handleQuizTimeUpdate}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[2000ms] ease-out z-0 ${isQuizLoaded ? 'opacity-30 group-hover:opacity-70' : 'opacity-0'}`}
-            >
-              <source src="/videos/coffee-perfil.mp4" type="video/mp4" />
-            </video>
-            
-            {/* Camada de Fade Cinematográfico para o Loop */}
-            <div 
-              className={`absolute inset-0 bg-[#0a0705] transition-opacity duration-700 z-[1] pointer-events-none ${
-                isQuizFading ? "opacity-100" : "opacity-0"
-              }`} 
-            />
-            
-            {/* Gradient Overlay de Proteção para Contraste */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0705] via-[#0a0705]/40 to-transparent z-0 pointer-events-none" />
-            
-            <div className="relative z-10 mb-6">
-              <h3 className="font-serif text-2xl lg:text-3xl font-bold mb-2 lg:mb-3 text-white">Encontre Seu Terroir</h3>
-              <p className="text-white/80 text-sm lg:text-base leading-relaxed hidden md:block">
-                Responda a três breves perguntas e descubra o grão perfeito para a sua jornada sensorial.
-              </p>
-            </div>
-            
-            {/* Botão Interativo Moderno */}
-            <div className="relative z-10 inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm font-medium transition-all duration-300 group-hover:bg-white/10 group-hover:border-white/30 text-white w-fit shadow-lg">
-              Iniciar Avaliação
-              <div className="bg-coffee-caramel rounded-full p-2 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110 shadow-md">
-                <LuArrowRight className="w-4 h-4 text-white" />
-              </div>
-            </div>
-          </Link>
+export default function HeroSection() {
+  return (
+    <section className="h-screen min-h-150 w-full flex flex-col lg:flex-row overflow-hidden bg-[#0a0705]">
+      {/* Bloco principal */}
+      <div className="relative w-full lg:w-[75%] h-[60%] lg:h-full flex items-end p-8 md:p-16 lg:p-24 overflow-hidden group">
+        <LoopVideo
+          name="coffee"
+          autoPlay
+          fadeColor="#0a0705"
+          className="transition-transform duration-1000 ease-out group-hover:scale-105"
+        />
+        <div className="absolute inset-0 z-1 bg-linear-to-t from-[#0a0705] via-black/40 to-black/10" />
+        <div className="absolute inset-0 z-2 bg-noise opacity-20 mix-blend-overlay pointer-events-none" />
 
-          {/* Card Loja */}
-          <Link 
-            href="#loja"
-            onMouseEnter={() => lojaVideoRef.current?.play()}
-            onMouseLeave={() => lojaVideoRef.current?.pause()}
-            className="group flex-1 bg-gradient-to-br from-[#B87333] to-[#8c5422] text-white p-8 lg:p-12 flex flex-col justify-center lg:justify-end transition-colors duration-700 overflow-hidden relative"
-          >
-            {/* Background Video Revelado no Hover */}
-            <video 
-              ref={lojaVideoRef}
-              loop 
-              muted 
-              playsInline
-              preload="auto"
-              onCanPlay={() => setIsLojaLoaded(true)}
-              onTimeUpdate={handleLojaTimeUpdate}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[2000ms] ease-out z-0 ${isLojaLoaded ? 'opacity-25 group-hover:opacity-70' : 'opacity-0'}`}
-            >
-              <source src="/videos/coffee-shop.mp4" type="video/mp4" />
-            </video>
-
-            {/* Camada de Fade Cinematográfico para o Loop */}
-            <div 
-              className={`absolute inset-0 bg-[#8c5422] transition-opacity duration-700 z-[1] pointer-events-none ${
-                isLojaFading ? "opacity-100" : "opacity-0"
-              }`} 
-            />
-
-            {/* Gradient Overlay de Proteção para Contraste */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#8c5422] via-[#8c5422]/20 to-transparent z-0 pointer-events-none" />
-
-            <div className="relative z-10 mb-6">
-              <h3 className="font-serif text-2xl lg:text-3xl font-bold mb-2 lg:mb-3 text-white">Boutique Premium</h3>
-              <p className="text-white/90 text-sm lg:text-base leading-relaxed hidden md:block">
-                Acessórios profissionais e pacotes avulsos escolhidos a dedo por nossos mestres de torra.
-              </p>
-            </div>
-
-            {/* Botão Interativo Moderno */}
-            <div className="relative z-10 inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full border border-white/10 bg-white/10 backdrop-blur-sm font-medium transition-all duration-300 group-hover:bg-white/20 group-hover:border-white/40 text-white w-fit shadow-lg">
-              Explorar Catálogo
-              <div className="bg-coffee-dark rounded-full p-2 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110 shadow-md">
-                <LuArrowRight className="w-4 h-4 text-white" />
-              </div>
-            </div>
-          </Link>
+        <div className="relative z-10 text-coffee-cream max-w-4xl">
+          <span className="animate-fade-up text-coffee-caramel font-medium tracking-[0.3em] text-sm uppercase mb-6 block drop-shadow-md">
+            Curadoria Premium
+          </span>
+          <h1 className="animate-fade-up [animation-delay:100ms] font-serif text-5xl md:text-6xl lg:text-7xl font-normal leading-[1.1] mb-8 lg:mb-10 text-white/90 text-balance tracking-tight">
+            O ápice do <br />
+            <span className="italic font-light text-coffee-cream">Terroir.</span>
+          </h1>
+          <p className="animate-fade-up [animation-delay:200ms] text-lg md:text-2xl text-white/80 leading-relaxed max-w-xl font-light">
+            Grãos raros. Torra impecável. Uma experiência sensorial exclusiva entregue na sua porta.
+          </p>
         </div>
+      </div>
 
+      {/* Cards secundários */}
+      <div className="w-full lg:w-[25%] h-[40%] lg:h-full flex flex-col">
+        {CARDS.map((card) => <HeroCard key={card.href} card={card} />)}
       </div>
     </section>
   );

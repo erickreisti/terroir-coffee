@@ -62,20 +62,23 @@ const FLAVORS = [
   },
 ];
 
-const RESULTS: Record<string, { title: string; desc: string; price: number; tags: string[] }> = {
+const RESULTS: Record<string, { planId: string; title: string; desc: string; price: number; tags: string[] }> = {
   doce: {
+    planId: "entusiasta",
     title: "Plano Entusiasta",
     desc: "Micro-lotes com perfil doce e encorpado — chocolate amargo, caramelo e avelã. Torra média-alta, corpo aveludado.",
     price: 129.90,
     tags: ["Chocolate", "Caramelo", "Corpo Alto"],
   },
   frutado: {
+    planId: "sommelier",
     title: "Plano Sommelier",
     desc: "Cafés exóticos com acidez brilhante e notas florais ou de frutas vermelhas. Para paladares aventureiros.",
     price: 189.90,
     tags: ["Florais", "Frutas Vermelhas", "Acidez Elegante"],
   },
   equilibrado: {
+    planId: "curioso",
     title: "Plano Curioso",
     desc: "Uma coleção equilibrada e surpreendente a cada mês. Perfeito para explorar o universo dos cafés especiais.",
     price: 69.90,
@@ -101,7 +104,8 @@ export default function CoffeeQuiz() {
   const handleSubscribe = () => {
     if (!result) return;
     addItem({
-      id: result.title.toLowerCase().replace(/ /g, "-"),
+      // Mesmo id usado no Showcase, para não duplicar o plano no carrinho
+      id: result.planId,
       name: `Assinatura: ${result.title.replace("Plano ", "")}`,
       price: result.price,
       isSubscription: true,
@@ -113,14 +117,14 @@ export default function CoffeeQuiz() {
 
       {/* Header fixo da seção */}
       <div className="pt-24 pb-16 text-center px-4">
-        <span className="text-coffee-caramel tracking-[0.25em] text-xs uppercase font-medium block mb-4">
+        <span className="text-coffee-amber tracking-[0.25em] text-xs uppercase font-medium block mb-4">
           Descubra seu Terroir
         </span>
         <h2 className="font-serif text-5xl md:text-6xl font-bold mb-4">
           Qual é o seu café?
         </h2>
         <p className="text-coffee-cream/60 text-lg max-w-xl mx-auto">
-          Três perguntas. Um match perfeito. Sem erro.
+          Duas perguntas. Um match perfeito. Sem erro.
         </p>
       </div>
 
@@ -156,7 +160,7 @@ export default function CoffeeQuiz() {
                     <span className="text-xs font-bold text-white/60">{i + 1}</span>
                   )}
                 </motion.div>
-                <span className={`text-xs tracking-wider uppercase ${active ? "text-coffee-caramel font-bold" : "text-white/30"}`}>
+                <span className={`text-xs tracking-wider uppercase ${active ? "text-coffee-amber font-bold" : "text-white/50"}`}>
                   {step.label}
                 </span>
               </div>
@@ -189,7 +193,7 @@ export default function CoffeeQuiz() {
               </p>
               <button
                 onClick={() => setCurrentStep("method")}
-                className="inline-flex items-center gap-3 bg-coffee-caramel hover:bg-coffee-accent text-white px-10 py-4 rounded-full font-medium transition-all text-lg shadow-lg shadow-coffee-caramel/20"
+                className="inline-flex items-center gap-3 bg-coffee-copper hover:bg-coffee-accent text-white px-10 py-4 rounded-full font-medium transition-all text-lg shadow-lg shadow-coffee-caramel/20"
               >
                 Começar o Quiz
                 <LuArrowRight className="w-5 h-5" />
@@ -223,7 +227,7 @@ export default function CoffeeQuiz() {
                     }`}
                   >
                     {/* Efeito de Vidro/Brilho Interno */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                    <div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                     <div className={`${answers.method === item.id ? "text-coffee-caramel" : "text-white/40 group-hover:text-coffee-caramel"} transition-colors`}>
                       {item.icon}
@@ -267,14 +271,14 @@ export default function CoffeeQuiz() {
                     whileHover={{ y: -6, scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => selectAnswer("flavor", item.id)}
-                    className={`relative overflow-hidden flex flex-col gap-5 p-8 border rounded-2xl text-left transition-all duration-500 group bg-gradient-to-br backdrop-blur-md ${item.gradient} ${
+                    className={`relative overflow-hidden flex flex-col gap-5 p-8 border rounded-2xl text-left transition-all duration-500 group bg-linear-to-br backdrop-blur-md ${item.gradient} ${
                       answers.flavor === item.id
                         ? "border-coffee-caramel shadow-[0_0_30px_rgba(184,115,51,0.15)]"
                         : "border-white/10 hover:border-coffee-caramel/40 opacity-80 hover:opacity-100"
                     }`}
                   >
                     {/* Efeito de Vidro/Brilho Interno */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                    <div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                     <div className={`${answers.flavor === item.id ? "text-coffee-caramel" : "text-white/40 group-hover:text-coffee-caramel"} transition-colors`}>
                       {item.icon}
@@ -317,7 +321,7 @@ export default function CoffeeQuiz() {
                 >
                   <LuCheck className="w-12 h-12 text-coffee-caramel" />
                 </motion.div>
-                <span className="text-coffee-caramel tracking-[0.25em] text-xs uppercase font-medium block mb-4">
+                <span className="text-coffee-amber tracking-[0.25em] text-xs uppercase font-medium block mb-4">
                   Seu Match Perfeito
                 </span>
                 <h3 className="font-serif text-5xl font-bold text-white mb-6">{result.title}</h3>
@@ -341,7 +345,7 @@ export default function CoffeeQuiz() {
               <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
                 <button
                   onClick={handleSubscribe}
-                  className="inline-flex items-center gap-3 bg-coffee-caramel hover:bg-coffee-accent text-white px-10 py-4 rounded-full font-medium transition-all text-lg shadow-lg shadow-coffee-caramel/20"
+                  className="inline-flex items-center gap-3 bg-coffee-copper hover:bg-coffee-accent text-white px-10 py-4 rounded-full font-medium transition-all text-lg shadow-lg shadow-coffee-caramel/20"
                 >
                   Assinar por R$ {result.price.toFixed(2).replace(".", ",")}
                   <LuArrowRight className="w-5 h-5" />

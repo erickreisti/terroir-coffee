@@ -12,11 +12,11 @@ export default function CartDrawer() {
   return (
     <>
       <div 
-        className="fixed inset-0 bg-black/50 z-[60] backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/50 z-60 backdrop-blur-sm transition-opacity"
         onClick={closeCart}
       />
       
-      <div className="fixed top-0 right-0 h-full w-full max-w-md bg-[#0a0705]/95 backdrop-blur-2xl z-[70] shadow-2xl flex flex-col animate-in slide-in-from-right duration-500 border-l border-white/10 overflow-hidden">
+      <div className="fixed top-0 right-0 h-full w-full max-w-md bg-[#0a0705]/95 backdrop-blur-2xl z-70 shadow-2xl flex flex-col animate-[slide-in-right_0.5s_ease-out] border-l border-white/10 overflow-hidden">
         {/* Amber Dust Effect no fundo do Drawer */}
         <div className="absolute top-0 right-0 w-full h-1/2 bg-[radial-gradient(ellipse_at_top_right,rgba(184,115,51,0.15)_0%,transparent_60%)] pointer-events-none" />
 
@@ -113,7 +113,7 @@ export default function CartDrawer() {
               className="group relative w-full overflow-hidden bg-coffee-caramel hover:bg-[#c9803b] text-white py-4 rounded-full font-bold tracking-wide transition-all duration-300 flex items-center justify-center shadow-[0_0_30px_rgba(184,115,51,0.2)]"
             >
               <span className="relative z-10">Finalizar Pedido</span>
-              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
+              <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
             </Link>
           </div>
         )}

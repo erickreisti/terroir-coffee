@@ -1,6 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+
+const STORAGE_KEY = 'terroir-cart';
 
 export type CartItem = {
   id: string;
@@ -14,6 +16,7 @@ export type CartItem = {
 type CartContextType = {
   items: CartItem[];
   isCartOpen: boolean;
+  isHydrated: boolean;
   openCart: () => void;
   closeCart: () => void;
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
@@ -28,6 +31,21 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Persiste o carrinho para sobreviver a um refresh (ex.: no /checkout)
+  const [isHydrated, setIsHydrated] = useState(false);
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- leitura única do localStorage após montar
+      if (saved) setItems(JSON.parse(saved));
+    } catch {}
+    setIsHydrated(true);
+  }, []);
+  useEffect(() => {
+    if (!isHydrated) return;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch {}
+  }, [items, isHydrated]);
 
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
@@ -66,7 +84,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ items, isCartOpen, openCart, closeCart, addItem, removeItem, updateQuantity, clearCart, total }}>
+    <CartContext.Provider value={{ items, isCartOpen, isHydrated, openCart, closeCart, addItem, removeItem, updateQuantity, clearCart, total }}>
       {children}
     </CartContext.Provider>
   );

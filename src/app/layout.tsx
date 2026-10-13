@@ -11,11 +11,32 @@ const sans = DM_Sans({
 const serif = Fraunces({
   variable: "--font-serif-main",
   subsets: ["latin"],
+  style: ["normal", "italic"],
 });
 
+const SITE_URL = "https://terroir-coffee-three.vercel.app";
+const DESCRIPTION = "A Terroir conecta os paladares mais exigentes às melhores safras de cafés especiais.";
+
 export const metadata: Metadata = {
-  title: "Terroir Coffee Co.",
-  description: "A Terroir conecta os paladares mais exigentes às melhores safras de cafés especiais.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Terroir Coffee Co.",
+    template: "%s | Terroir Coffee Co.",
+  },
+  description: DESCRIPTION,
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: "/",
+    siteName: "Terroir Coffee Co.",
+    title: "Terroir Coffee Co. — Cafés especiais de micro-lotes",
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terroir Coffee Co. — Cafés especiais de micro-lotes",
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

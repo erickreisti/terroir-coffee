@@ -1,15 +1,39 @@
 "use client";
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
-import { LuArrowLeft, LuCreditCard, LuLock, LuCircleCheck } from "react-icons/lu";
+import { LuArrowLeft, LuCreditCard, LuLock, LuCircleCheck, LuInfo, LuLoaderCircle } from "react-icons/lu";
 import { useRouter } from 'next/navigation';
+
+// Máscaras simples: mantêm só os dígitos e reaplicam a formatação
+const onlyDigits = (v: string, max: number) => v.replace(/\D/g, '').slice(0, max);
+const maskCep = (v: string) => onlyDigits(v, 8).replace(/^(\d{5})(\d)/, '$1-$2');
+const maskCard = (v: string) => onlyDigits(v, 16).replace(/(\d{4})(?=\d)/g, '$1 ');
+const maskExpiry = (v: string) => onlyDigits(v, 4).replace(/^(\d{2})(\d)/, '$1/$2');
+
+// Bandeira pelo prefixo, só para destacar o selo no cartão
+function cardBrand(card: string) {
+  const d = card.replace(/\D/g, '');
+  if (/^(4011|4312|4389|4514|4576|5041|5066|5067|6277|6362|6363|6504|6505|6516)/.test(d)) return 'ELO';
+  if (/^4/.test(d)) return 'VISA';
+  if (/^(5[1-5]|2[2-7])/.test(d)) return 'MASTER';
+  return null;
+}
+
+type CepStatus = 'idle' | 'loading' | 'found' | 'notfound';
 
 export default function CheckoutPage() {
   const { items, total, clearCart, isHydrated } = useCart();
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [cep, setCep] = useState('');
+  const [rua, setRua] = useState('');
+  const [card, setCard] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvv, setCvv] = useState('');
+  const [cepStatus, setCepStatus] = useState<CepStatus>('idle');
+  const ruaRef = useRef<HTMLInputElement>(null);
 
   // Espera o carrinho ser lido do localStorage antes de decidir
   if (!isHydrated) return <div className="min-h-screen bg-[#0a0705]" />;
@@ -26,6 +50,40 @@ export default function CheckoutPage() {
       </div>
     );
   }
+
+  // Preenche o endereço pela API pública do ViaCEP quando o CEP fica completo
+  const handleCep = async (value: string) => {
+    const masked = maskCep(value);
+    setCep(masked);
+    const digits = masked.replace('-', '');
+    if (digits.length !== 8) {
+      setCepStatus('idle');
+      return;
+    }
+    setCepStatus('loading');
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+      const data = await res.json();
+      if (data.erro) throw new Error('CEP não encontrado');
+      const street = data.logradouro ? `${data.logradouro}, nº ` : '';
+      const rest = [data.bairro, `${data.localidade}/${data.uf}`].filter(Boolean).join(', ');
+      setRua(street ? `${street}, ${rest}` : rest);
+      setCepStatus('found');
+      // Leva o cursor para depois de "nº " para digitar só o número
+      requestAnimationFrame(() => {
+        const input = ruaRef.current;
+        if (!input) return;
+        const idx = input.value.indexOf('nº ');
+        const pos = idx >= 0 ? idx + 3 : input.value.length;
+        input.focus();
+        input.setSelectionRange(pos, pos);
+      });
+    } catch {
+      setCepStatus('notfound');
+    }
+  };
+
+  const brand = cardBrand(card);
 
   const handleCheckout = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +124,13 @@ export default function CheckoutPage() {
           
           {/* Formulários (Esquerda) */}
           <form onSubmit={handleCheckout} className="w-full lg:w-3/5 space-y-12">
+            <div role="note" className="flex items-start gap-3 rounded-xl border border-coffee-gold/30 bg-coffee-gold/10 px-5 py-4 text-sm text-white/80">
+              <LuInfo className="w-5 h-5 text-coffee-gold shrink-0 mt-0.5" />
+              <p>
+                <strong className="text-coffee-gold font-semibold">Ambiente demonstrativo.</strong>{' '}
+                Nenhum pagamento é processado e nenhum dado sai do seu navegador. Use dados fictícios, como o cartão 4242 4242 4242 4242.
+              </p>
+            </div>
             
             {/* Seção 1: Identificação */}
             <section>
@@ -76,11 +141,11 @@ export default function CheckoutPage() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="relative group">
-                    <input type="text" id="nome" required className="block w-full bg-white/5 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white focus:outline-none focus:border-coffee-caramel focus:ring-1 focus:ring-coffee-caramel transition-all peer" placeholder=" " />
+                    <input type="text" id="nome" required autoComplete="name" className="block w-full bg-white/5 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white focus:outline-none focus:border-coffee-caramel focus:ring-1 focus:ring-coffee-caramel transition-all peer" placeholder=" " />
                     <label htmlFor="nome" className="absolute text-sm text-white/50 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-coffee-caramel">Nome Completo</label>
                   </div>
                   <div className="relative group">
-                    <input type="email" id="email" required className="block w-full bg-white/5 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white focus:outline-none focus:border-coffee-caramel focus:ring-1 focus:ring-coffee-caramel transition-all peer" placeholder=" " />
+                    <input type="email" id="email" required autoComplete="email" className="block w-full bg-white/5 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white focus:outline-none focus:border-coffee-caramel focus:ring-1 focus:ring-coffee-caramel transition-all peer" placeholder=" " />
                     <label htmlFor="email" className="absolute text-sm text-white/50 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-coffee-caramel">E-mail de Contato</label>
                   </div>
                 </div>
@@ -96,11 +161,19 @@ export default function CheckoutPage() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="relative group md:col-span-1">
-                    <input type="text" id="cep" required className="block w-full bg-white/5 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white focus:outline-none focus:border-coffee-caramel transition-all peer" placeholder=" " />
+                    <input type="text" id="cep" required inputMode="numeric" autoComplete="postal-code" pattern="\d{5}-\d{3}" title="CEP com 8 dígitos" aria-describedby="cep-status" value={cep} onChange={(e) => handleCep(e.target.value)} className="block w-full bg-white/5 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white focus:outline-none focus:border-coffee-caramel transition-all peer" placeholder=" " />
                     <label htmlFor="cep" className="absolute text-sm text-white/50 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-coffee-caramel">CEP</label>
+                    {cepStatus === 'loading' && (
+                      <LuLoaderCircle aria-hidden="true" className="absolute right-4 top-4 w-4 h-4 text-coffee-caramel animate-spin" />
+                    )}
+                    <p id="cep-status" aria-live="polite" className="mt-2 text-xs text-white/60 empty:hidden">
+                      {cepStatus === 'loading' && 'Buscando endereço...'}
+                      {cepStatus === 'found' && 'Endereço encontrado. Complete com o número.'}
+                      {cepStatus === 'notfound' && 'CEP não encontrado. Preencha o endereço à mão.'}
+                    </p>
                   </div>
                   <div className="relative group md:col-span-2">
-                    <input type="text" id="rua" required className="block w-full bg-white/5 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white focus:outline-none focus:border-coffee-caramel transition-all peer" placeholder=" " />
+                    <input ref={ruaRef} type="text" id="rua" required autoComplete="street-address" value={rua} onChange={(e) => setRua(e.target.value)} className="block w-full bg-white/5 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white focus:outline-none focus:border-coffee-caramel transition-all peer" placeholder=" " />
                     <label htmlFor="rua" className="absolute text-sm text-white/50 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-coffee-caramel">Endereço Completo</label>
                   </div>
                 </div>
@@ -126,23 +199,31 @@ export default function CheckoutPage() {
                         Cartão de Crédito
                       </span>
                       <div className="flex gap-2">
-                        <div className="w-8 h-5 bg-white/20 rounded" />
-                        <div className="w-8 h-5 bg-white/20 rounded" />
+                        {['VISA', 'MASTER', 'ELO'].map((b) => (
+                          <span
+                            key={b}
+                            className={`px-2 h-5 rounded text-[9px] font-bold tracking-wider flex items-center transition-colors duration-300 ${
+                              brand === b ? 'bg-coffee-gold text-coffee-dark' : 'bg-white/10 text-white/50'
+                            }`}
+                          >
+                            {b}
+                          </span>
+                        ))}
                       </div>
                     </div>
                     
                     <div className="relative group">
-                      <input type="text" id="card" required maxLength={19} className="block w-full bg-black/20 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white font-mono tracking-wider focus:outline-none focus:border-coffee-caramel transition-all peer" placeholder=" " />
+                      <input type="text" id="card" required inputMode="numeric" autoComplete="cc-number" pattern="(\d{4} ){3}\d{4}" title="Número do cartão com 16 dígitos" value={card} onChange={(e) => setCard(maskCard(e.target.value))} className="block w-full bg-black/20 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white font-mono tracking-wider focus:outline-none focus:border-coffee-caramel transition-all peer" placeholder=" " />
                       <label htmlFor="card" className="absolute text-sm text-white/50 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-coffee-caramel">Número do Cartão</label>
                     </div>
 
                     <div className="grid grid-cols-2 gap-6">
                       <div className="relative group">
-                        <input type="text" id="expiry" required maxLength={5} className="block w-full bg-black/20 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white font-mono tracking-wider focus:outline-none focus:border-coffee-caramel transition-all peer" placeholder=" " />
+                        <input type="text" id="expiry" required inputMode="numeric" autoComplete="cc-exp" pattern="(0[1-9]|1[0-2])/\d{2}" title="Mês e ano no formato MM/AA" value={expiry} onChange={(e) => setExpiry(maskExpiry(e.target.value))} className="block w-full bg-black/20 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white font-mono tracking-wider focus:outline-none focus:border-coffee-caramel transition-all peer" placeholder=" " />
                         <label htmlFor="expiry" className="absolute text-sm text-white/50 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-coffee-caramel">Validade (MM/AA)</label>
                       </div>
                       <div className="relative group">
-                        <input type="text" id="cvv" required maxLength={4} className="block w-full bg-black/20 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white font-mono tracking-wider focus:outline-none focus:border-coffee-caramel transition-all peer" placeholder=" " />
+                        <input type="password" id="cvv" required inputMode="numeric" autoComplete="cc-csc" pattern="\d{3,4}" title="3 ou 4 dígitos" value={cvv} onChange={(e) => setCvv(onlyDigits(e.target.value, 4))} className="block w-full bg-black/20 border border-white/10 rounded-lg px-4 pt-6 pb-2 text-white font-mono tracking-wider focus:outline-none focus:border-coffee-caramel transition-all peer" placeholder=" " />
                         <label htmlFor="cvv" className="absolute text-sm text-white/50 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-coffee-caramel">CVV</label>
                       </div>
                     </div>

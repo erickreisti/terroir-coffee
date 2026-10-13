@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Termos, Privacidade e FAQ | Terroir Coffee Co.",
+  title: "Termos, Privacidade e FAQ",
 };
 
 const SECTIONS = [

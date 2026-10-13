@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { m, useInView } from "framer-motion";
 
 /* ─────────────────────────────────────────────
    SVG: Folha
@@ -86,7 +86,7 @@ function FloatingParticles({
         const leafBean = cfg as typeof LEAF_CONFIGS[0];
         const steam = cfg as typeof STEAM_CONFIGS[0];
         return (
-          <motion.div
+          <m.div
             key={i}
             className="absolute"
             style={
@@ -137,7 +137,7 @@ function FloatingParticles({
           ) : (
             <SteamSvg size={cfg.size} />
           )}
-          </motion.div>
+          </m.div>
         );
       })}
     </div>
@@ -187,7 +187,7 @@ function SplitText({
     <span ref={ref} className={`inline ${className}`}>
       <span className="sr-only">{text}</span>
       {text.split("").map((char, i) => (
-        <motion.span
+        <m.span
           key={i}
           aria-hidden="true"
           className="inline-block"
@@ -213,7 +213,7 @@ function SplitText({
           }}
         >
           {char === " " ? "\u00A0" : char}
-        </motion.span>
+        </m.span>
       ))}
     </span>
   );
@@ -251,21 +251,21 @@ function BigRevealCard({
         />
       </h3>
 
-      <motion.div
+      <m.div
         className="h-px bg-coffee-caramel/50 mb-5"
         initial={{ scaleX: 0, originX: 0 }}
         animate={inView ? { scaleX: 1 } : {}}
         transition={{ duration: 0.8, delay: titleDelay + 0.2 }}
       />
 
-      <motion.p
-        className="text-base md:text-lg text-white/70 leading-relaxed"
+      <m.p
+        className="text-base md:text-lg text-white/85 leading-relaxed"
         initial={{ opacity: 0, y: 16 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, delay: bodyDelay }}
       >
         {body}
-      </motion.p>
+      </m.p>
     </div>
   );
 }
@@ -310,10 +310,10 @@ function ParallaxBlock({
 
   const overlayStyle =
     align === "left"
-      ? "linear-gradient(to right, rgba(22,11,6,0.94) 40%, rgba(22,11,6,0.15) 100%)"
+      ? "linear-gradient(to right, rgba(22,11,6,0.94) 40%, rgba(22,11,6,0.55) 100%)"
       : align === "right"
-        ? "linear-gradient(to left, rgba(22,11,6,0.94) 40%, rgba(22,11,6,0.15) 100%)"
-        : "rgba(22, 11, 6, 0.60)";
+        ? "linear-gradient(to left, rgba(22,11,6,0.94) 40%, rgba(22,11,6,0.55) 100%)"
+        : "rgba(22, 11, 6, 0.72)";
 
   return (
     <div
@@ -325,9 +325,9 @@ function ParallaxBlock({
       {/* Overlay */}
       <div className="absolute inset-0 z-0" style={{ background: overlayStyle }} />
 
-      {/* Luz ambiente âmbar pulsante (apenas quando ambientLight=true) */}
-      {ambientLight && (
-        <motion.div
+      {/* Luz ambiente âmbar pulsante (apenas quando ambientLight=true e o bloco já entrou na tela) */}
+      {ambientLight && inView && (
+        <m.div
           className="absolute inset-0 z-1 pointer-events-none"
           animate={{ opacity: [0.0, 0.18, 0.0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -344,7 +344,7 @@ function ParallaxBlock({
       )}
 
       {/* Container de texto — começa centrado, desliza para a esquerda */}
-      <motion.div
+      <m.div
         className="relative z-10 flex flex-col gap-6 px-12 md:px-16 lg:px-20"
         initial={{ x: "25vw" }}
         animate={phase === "settled" ? { x: 0 } : { x: "25vw" }}
@@ -354,13 +354,13 @@ function ParallaxBlock({
         {/* Label */}
         <SplitText
           text={label}
-          className="text-coffee-caramel tracking-[0.25em] text-xs uppercase font-medium"
+          className="text-coffee-gold tracking-[0.25em] text-xs uppercase font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
           baseDelay={inView ? 0 : 999}
           charDelay={22}
         />
 
         {/* Título — grande enquanto centrado */}
-        <motion.h2
+        <m.h2
           className="font-serif font-bold leading-tight text-white drop-shadow-2xl whitespace-nowrap"
           animate={
             phase === "settled"
@@ -379,41 +379,41 @@ function ParallaxBlock({
           transition={{ duration: 1.3, ease: [0.76, 0, 0.24, 1] }}
         >
           <SplitText text={title} baseDelay={inView ? 0.15 : 999} charDelay={25} />
-        </motion.h2>
+        </m.h2>
 
         {/* Parágrafo — só aparece após o slide */}
-        <motion.p
+        <m.p
           className="text-lg md:text-xl text-white/80 leading-relaxed max-w-md"
           initial={{ opacity: 0, y: 12 }}
           animate={phase === "settled" ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
           transition={{ duration: 0.9, delay: 0.3 }}
         >
           {paragraph}
-        </motion.p>
-      </motion.div>
+        </m.p>
+      </m.div>
 
       {/* Lado esquerdo para align=right */}
       {hasLeft && (
-        <motion.div
+        <m.div
           className="relative z-10 w-1/2 px-12 md:px-16 lg:px-20 flex flex-col gap-10 items-end text-right"
           initial={{ opacity: 0, x: -40 }}
           animate={phase === "settled" ? { opacity: 1, x: 0 } : { opacity: 0, x: -40 }}
           transition={{ duration: 0.9, delay: 0.4 }}
         >
           {leftContent}
-        </motion.div>
+        </m.div>
       )}
 
       {/* Lado direito para align=left */}
       {hasRight && (
-        <motion.div
+        <m.div
           className="relative z-10 w-1/2 px-12 md:px-16 lg:px-20 flex flex-col gap-10 items-start"
           initial={{ opacity: 0, x: 40 }}
           animate={phase === "settled" ? { opacity: 1, x: 0 } : { opacity: 0, x: 40 }}
           transition={{ duration: 0.9, delay: 0.4 }}
         >
           {rightContent}
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

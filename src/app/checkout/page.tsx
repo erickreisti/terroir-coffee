@@ -152,7 +152,7 @@ export default function CheckoutPage() {
                 <button 
                   type="submit" 
                   disabled={isProcessing}
-                  className="w-full relative overflow-hidden group bg-coffee-caramel hover:bg-[#c9803b] text-white py-5 rounded-full font-bold text-lg tracking-wide transition-all duration-300 shadow-[0_0_40px_rgba(184,115,51,0.3)] disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full relative overflow-hidden group bg-coffee-copper hover:bg-[#8c5422] text-white py-5 rounded-full font-bold text-lg tracking-wide transition-all duration-300 shadow-[0_0_40px_rgba(184,115,51,0.3)] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   <span className={`relative z-10 flex items-center justify-center gap-3 ${isProcessing ? 'opacity-0' : 'opacity-100'}`}>
                     <LuLock className="w-5 h-5" />

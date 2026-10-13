@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { LuArrowRight } from "react-icons/lu";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
 export default function CtaSection() {
@@ -28,7 +28,7 @@ export default function CtaSection() {
       <div className="absolute inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-t from-[#0a0705] via-transparent to-[#0a0705] z-10"></div>
         <div className="absolute inset-0 bg-black/60 z-5"></div>
-        <motion.img 
+        <m.img 
           src="/images/hero_bg.webp" 
           alt=""
           loading="lazy"
@@ -37,7 +37,7 @@ export default function CtaSection() {
         />
       </div>
 
-      <motion.div 
+      <m.div 
         style={{ opacity: opacityText, y: yText }}
         className="container mx-auto px-6 relative z-20 text-center max-w-4xl"
       >
@@ -56,7 +56,7 @@ export default function CtaSection() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
           <Link 
             href="#planos" 
-            className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full bg-coffee-caramel text-white font-medium hover:bg-white hover:text-coffee-dark transition-all duration-500 shadow-xl shadow-coffee-caramel/20 hover:shadow-2xl hover:shadow-white/20 hover:-translate-y-1 text-lg"
+            className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full bg-coffee-copper text-white font-medium hover:bg-white hover:text-coffee-dark transition-all duration-500 shadow-xl shadow-coffee-caramel/20 hover:shadow-2xl hover:shadow-white/20 hover:-translate-y-1 text-lg"
           >
             Escolher Assinatura
             <LuArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -69,7 +69,7 @@ export default function CtaSection() {
             Explorar Boutique
           </Link>
         </div>
-      </motion.div>
+      </m.div>
 
     </section>
   );

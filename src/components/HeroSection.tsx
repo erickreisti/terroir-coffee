@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { LuArrowRight } from "react-icons/lu";
-import { useRef, useState, type RefObject } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 
 type LoopVideoProps = {
   name: string;
@@ -16,6 +16,23 @@ type LoopVideoProps = {
 // e um fade para a cor de fundo pouco antes do corte do loop.
 function LoopVideo({ name, fadeColor, className = "", videoRef, autoPlay }: LoopVideoProps) {
   const [isFading, setIsFading] = useState(false);
+  // O vídeo principal só começa a baixar depois do load da página (o poster já cobre o LCP)
+  // e nem baixa com economia de dados ligada ou em 2G
+  const [src, setSrc] = useState(autoPlay ? undefined : `/videos/${name}.mp4`);
+  const [isPlaying, setIsPlaying] = useState(!autoPlay);
+
+  useEffect(() => {
+    if (!autoPlay) return;
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    if (conn?.saveData || conn?.effectiveType?.includes("2g")) return;
+
+    const start = () => setSrc(`/videos/${name}.mp4`);
+    if (document.readyState === "complete") start();
+    else {
+      window.addEventListener("load", start, { once: true });
+      return () => window.removeEventListener("load", start);
+    }
+  }, [autoPlay, name]);
 
   return (
     <>
@@ -35,11 +52,12 @@ function LoopVideo({ name, fadeColor, className = "", videoRef, autoPlay }: Loop
       )}
       <video
         ref={videoRef}
-        src={`/videos/${name}.mp4`}
+        src={src}
         // O vídeo principal já tem a <img> por baixo; poster só nos cards (evita baixar a versão desktop no celular)
         poster={autoPlay ? undefined : `/images/poster-${name}.webp`}
         autoPlay={autoPlay}
         preload={autoPlay ? "auto" : "metadata"}
+        onPlaying={() => setIsPlaying(true)}
         loop
         muted
         playsInline
@@ -47,7 +65,7 @@ function LoopVideo({ name, fadeColor, className = "", videoRef, autoPlay }: Loop
           const { currentTime, duration } = e.currentTarget;
           setIsFading(duration - currentTime < 0.8);
         }}
-        className={`absolute inset-0 w-full h-full object-cover ${className}`}
+        className={`absolute inset-0 w-full h-full object-cover ${isPlaying ? "" : "invisible"} ${className}`}
       />
       <div
         className={`absolute inset-0 z-1 pointer-events-none transition-opacity duration-700 ${isFading ? "opacity-100" : "opacity-0"}`}
@@ -76,10 +94,10 @@ const CARDS = [
     title: "Boutique Premium",
     text: "Acessórios profissionais e pacotes avulsos escolhidos a dedo por nossos mestres de torra.",
     cta: "Explorar Catálogo",
-    fadeColor: "#8c5422",
-    cardClass: "bg-linear-to-br from-[#B87333] to-[#8c5422]",
+    fadeColor: "#74451b",
+    cardClass: "bg-linear-to-br from-[#9a5d27] to-[#74451b]",
     videoClass: "opacity-25",
-    overlayClass: "from-[#8c5422] via-[#8c5422]/20",
+    overlayClass: "from-[#74451b] via-[#74451b]/40",
     iconClass: "bg-coffee-dark",
   },
 ];
@@ -104,10 +122,10 @@ function HeroCard({ card }: { card: (typeof CARDS)[number] }) {
 
       <div className="relative z-10 mb-6">
         <h2 className="font-serif text-2xl lg:text-3xl font-bold mb-2 lg:mb-3">{card.title}</h2>
-        <p className="text-white/85 text-sm lg:text-base leading-relaxed hidden md:block">{card.text}</p>
+        <p className="text-white text-sm lg:text-base leading-relaxed hidden md:block">{card.text}</p>
       </div>
 
-      <div className="relative z-10 inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full border border-white/10 bg-white/10 backdrop-blur-sm font-medium transition-all duration-300 group-hover:bg-white/20 group-hover:border-white/40 w-fit shadow-lg">
+      <div className="relative z-10 inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full border border-white/15 bg-black/25 backdrop-blur-sm font-medium transition-all duration-300 group-hover:bg-black/40 group-hover:border-white/40 w-fit shadow-lg">
         {card.cta}
         <div className={`rounded-full p-2 transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110 shadow-md ${card.iconClass}`}>
           <LuArrowRight className="w-4 h-4" />
@@ -128,11 +146,11 @@ export default function HeroSection() {
           fadeColor="#0a0705"
           className="transition-transform duration-1000 ease-out group-hover:scale-105"
         />
-        <div className="absolute inset-0 z-1 bg-linear-to-t from-[#0a0705] via-black/40 to-black/10" />
+        <div className="absolute inset-0 z-1 bg-linear-to-t from-[#0a0705] via-black/55 to-black/20" />
         <div className="absolute inset-0 z-2 bg-noise opacity-20 mix-blend-overlay pointer-events-none" />
 
         <div className="relative z-10 text-coffee-cream max-w-4xl">
-          <span className="animate-fade-up text-coffee-caramel font-medium tracking-[0.3em] text-sm uppercase mb-6 block drop-shadow-md">
+          <span className="animate-fade-up text-coffee-gold font-medium tracking-[0.3em] text-sm uppercase mb-6 block drop-shadow-md">
             Curadoria Premium
           </span>
           <h1 className="animate-fade-up [animation-delay:100ms] font-serif text-5xl md:text-6xl lg:text-7xl font-normal leading-[1.1] mb-8 lg:mb-10 text-white/90 text-balance tracking-tight">

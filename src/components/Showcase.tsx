@@ -2,7 +2,7 @@
 
 import { useRef, MouseEvent } from "react";
 import { LuArrowRight, LuCheck, LuStar, LuShoppingBag } from "react-icons/lu";
-import { motion, useInView, useMotionValue, useMotionTemplate } from "framer-motion";
+import { m, useInView, useMotionValue, useMotionTemplate } from "framer-motion";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 
@@ -87,7 +87,7 @@ function PlanCard({ plan, isPlansInView, handleSubscribe }: { plan: Plan, isPlan
   }
 
   return (
-    <motion.div
+    <m.div
       key={plan.id}
       variants={{
         hidden: { opacity: 0, y: 40 },
@@ -112,7 +112,7 @@ function PlanCard({ plan, isPlansInView, handleSubscribe }: { plan: Plan, isPlan
       }`}
     >
       {/* 1. Spotlight Glow Hover */}
-      <motion.div
+      <m.div
         className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover:opacity-100 z-0"
         style={{
           background: useMotionTemplate`
@@ -127,9 +127,9 @@ function PlanCard({ plan, isPlansInView, handleSubscribe }: { plan: Plan, isPlan
 
       {/* Badge "Mais Escolhido" com Shimmer no Hover */}
       {plan.recommended && (
-        <div className="absolute overflow-hidden -top-4 left-1/2 -translate-x-1/2 bg-coffee-caramel text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase shadow-lg shadow-coffee-caramel/20 whitespace-nowrap z-10">
+        <div className="absolute overflow-hidden -top-4 left-1/2 -translate-x-1/2 bg-coffee-copper text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase shadow-lg shadow-coffee-caramel/20 whitespace-nowrap z-10">
           Mais Escolhido
-          <motion.div
+          <m.div
             className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent skew-x-12"
             variants={{
               hover: { translateX: "100%", transition: { duration: 0.8, ease: "easeInOut" } }
@@ -145,7 +145,7 @@ function PlanCard({ plan, isPlansInView, handleSubscribe }: { plan: Plan, isPlan
       
       <div className="mb-8 pb-8 border-b border-white/10 relative z-10">
         <span className="text-5xl font-serif font-bold text-coffee-caramel">{plan.price}</span>
-        <span className="text-white/40 ml-2">/mês</span>
+        <span className="text-white/60 ml-2">/mês</span>
       </div>
       
       <ul className="space-y-5 mb-10 flex-grow relative z-10">
@@ -160,20 +160,20 @@ function PlanCard({ plan, isPlansInView, handleSubscribe }: { plan: Plan, isPlan
       </ul>
       
       {/* Botão com Pulse (Scale) no Hover */}
-      <motion.button
+      <m.button
         variants={{
           hover: { scale: 1.05 }
         }}
         onClick={() => handleSubscribe(plan)}
         className={`relative z-10 w-full py-4 rounded-full font-medium transition-colors flex items-center justify-center gap-2 ${
           plan.recommended
-            ? "bg-coffee-caramel text-white shadow-lg shadow-coffee-caramel/25"
+            ? "bg-coffee-copper text-white shadow-lg shadow-coffee-caramel/25"
             : "bg-white/5 text-white border border-white/10"
         }`}
       >
         Assinar {plan.name}
-      </motion.button>
-    </motion.div>
+      </m.button>
+    </m.div>
   );
 }
 
@@ -215,30 +215,30 @@ export default function Showcase() {
 
         <div className="container mx-auto px-4 relative z-10" ref={plansRef}>
           <div className="text-center mb-20">
-            <motion.span 
+            <m.span 
               initial={{ opacity: 0, y: 20 }}
               animate={isPlansInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6 }}
               className="text-coffee-caramel tracking-[0.25em] text-xs uppercase font-medium block mb-4"
             >
               Nossas Assinaturas
-            </motion.span>
-            <motion.h2 
+            </m.span>
+            <m.h2 
               initial={{ opacity: 0, y: 20 }}
               animate={isPlansInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.1 }}
               className="font-serif text-5xl md:text-6xl font-bold mb-6"
             >
               Escolha seu Ritual
-            </motion.h2>
-            <motion.p 
+            </m.h2>
+            <m.p 
               initial={{ opacity: 0, y: 20 }}
               animate={isPlansInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-white/60 text-lg max-w-2xl mx-auto"
             >
               Receba mensalmente cafés frescos, torrados artesanalmente, sem se preocupar em pedir. Cancele quando quiser.
-            </motion.p>
+            </m.p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-center">
@@ -262,33 +262,33 @@ export default function Showcase() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div className="max-w-2xl">
-              <motion.span 
+              <m.span 
                 initial={{ opacity: 0, x: -20 }}
                 animate={isShopInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.6 }}
                 className="text-coffee-caramel tracking-[0.25em] text-xs uppercase font-medium block mb-4"
               >
                 Boutique
-              </motion.span>
-              <motion.h2 
+              </m.span>
+              <m.h2 
                 initial={{ opacity: 0, x: -20 }}
                 animate={isShopInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="font-serif text-4xl md:text-5xl font-bold text-white mb-4"
               >
                 Equipamentos & Edições Limitadas
-              </motion.h2>
-              <motion.p 
+              </m.h2>
+              <m.p 
                 initial={{ opacity: 0, x: -20 }}
                 animate={isShopInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-white/60 text-lg"
               >
                 Tudo que você precisa para extrair o máximo de sabor, selecionado a dedo pelos nossos baristas.
-              </motion.p>
+              </m.p>
             </div>
             
-            <motion.button 
+            <m.button 
               initial={{ opacity: 0, x: 20 }}
               animate={isShopInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.3 }}
@@ -296,12 +296,12 @@ export default function Showcase() {
             >
               Ver coleção completa
               <LuArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
+            </m.button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {products.map((product, idx) => (
-              <motion.div 
+              <m.div 
                 key={product.id} 
                 initial={{ opacity: 0, y: 30 }}
                 animate={isShopInView ? { opacity: 1, y: 0 } : {}}
@@ -316,7 +316,7 @@ export default function Showcase() {
                     sizes="(min-width: 768px) 33vw, 100vw"
                     className="object-cover w-full h-full opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
                   />
-                  <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-medium tracking-wider uppercase text-white/90 border border-white/10">
+                  <div className="absolute top-4 left-4 bg-black/75 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-medium tracking-wider uppercase text-white/90 border border-white/10">
                     {product.category}
                   </div>
                   
@@ -327,7 +327,7 @@ export default function Showcase() {
                         e.stopPropagation();
                         handleAddProduct(product);
                       }}
-                      className="bg-coffee-caramel text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-xl"
+                      className="bg-coffee-copper text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-xl"
                     >
                       <LuShoppingBag className="w-4 h-4" />
                       Adicionar
@@ -348,10 +348,10 @@ export default function Showcase() {
                     {[...Array(5)].map((_, i) => (
                       <LuStar key={i} className="w-4 h-4 fill-coffee-caramel text-coffee-caramel" />
                     ))}
-                    <span className="text-xs text-white/40 ml-2">(Avaliações premium)</span>
+                    <span className="text-xs text-white/60 ml-2">(Avaliações premium)</span>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>

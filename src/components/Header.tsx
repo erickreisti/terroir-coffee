@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { LuShoppingBag, LuMenu, LuX } from "react-icons/lu";
 import { useState, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import { NAV_LINKS } from './navLinks';
 
@@ -64,7 +64,7 @@ export default function Header() {
           >
             <LuShoppingBag className="w-5 h-5 stroke-[1.5]" />
             {itemCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-coffee-caramel text-white text-[10px] font-bold flex items-center justify-center rounded-full shadow-lg border border-coffee-dark/50 group-hover:bg-white group-hover:text-coffee-caramel transition-colors">
+              <span className="absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-coffee-copper text-white text-[10px] font-bold flex items-center justify-center rounded-full shadow-lg border border-coffee-dark/50 group-hover:bg-white group-hover:text-coffee-copper transition-colors">
                 {itemCount}
               </span>
             )}
@@ -86,7 +86,7 @@ export default function Header() {
       {/* Menu mobile */}
       <AnimatePresence>
         {menuOpen && (
-          <motion.nav
+          <m.nav
             id="mobile-menu"
             className="md:hidden overflow-hidden"
             initial={{ height: 0, opacity: 0 }}
@@ -96,7 +96,7 @@ export default function Header() {
           >
             <ul className="container mx-auto px-6 pt-4 pb-8 flex flex-col gap-1">
               {NAV_LINKS.map((link, i) => (
-                <motion.li
+                <m.li
                   key={link.name}
                   initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -109,10 +109,10 @@ export default function Header() {
                   >
                     {link.name}
                   </Link>
-                </motion.li>
+                </m.li>
               ))}
             </ul>
-          </motion.nav>
+          </m.nav>
         )}
       </AnimatePresence>
     </header>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { LuArrowRight, LuCheck, LuCoffee, LuDroplets, LuThermometerSun, LuFlame, LuLeaf, LuStar } from "react-icons/lu";
 import { useCart } from "@/context/CartContext";
 
@@ -134,7 +134,7 @@ export default function CoffeeQuiz() {
           {/* Linha de fundo */}
           <div className="absolute top-5 left-0 right-0 h-px bg-white/10" />
           {/* Linha de progresso */}
-          <motion.div
+          <m.div
             className="absolute top-5 left-0 h-px bg-coffee-caramel"
             initial={{ width: "0%" }}
             animate={{ width: `${(stepIndex / (STEPS.length - 1)) * 100}%` }}
@@ -145,10 +145,10 @@ export default function CoffeeQuiz() {
             const active  = i === stepIndex;
             return (
               <div key={step.id} className="flex flex-col items-center gap-2 z-10">
-                <motion.div
+                <m.div
                   animate={{
-                    backgroundColor: done || active ? "#b87333" : "rgba(0, 0, 0, 0)",
-                    borderColor: done || active ? "#b87333" : "rgba(255,255,255,0.2)",
+                    backgroundColor: done || active ? "#a0622a" : "rgba(0, 0, 0, 0)",
+                    borderColor: done || active ? "#a0622a" : "rgba(255,255,255,0.2)",
                     scale: active ? 1.2 : 1,
                   }}
                   transition={{ duration: 0.4 }}
@@ -157,9 +157,9 @@ export default function CoffeeQuiz() {
                   {done ? (
                     <LuCheck className="w-4 h-4 text-white" />
                   ) : (
-                    <span className="text-xs font-bold text-white/60">{i + 1}</span>
+                    <span className={`text-xs font-bold ${active ? "text-white" : "text-white/60"}`}>{i + 1}</span>
                   )}
-                </motion.div>
+                </m.div>
                 <span className={`text-xs tracking-wider uppercase ${active ? "text-coffee-amber font-bold" : "text-white/50"}`}>
                   {step.label}
                 </span>
@@ -175,7 +175,7 @@ export default function CoffeeQuiz() {
 
           {/* INTRO */}
           {currentStep === "intro" && (
-            <motion.div
+            <m.div
               key="intro"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -198,12 +198,12 @@ export default function CoffeeQuiz() {
                 Começar o Quiz
                 <LuArrowRight className="w-5 h-5" />
               </button>
-            </motion.div>
+            </m.div>
           )}
 
           {/* MÉTODO */}
           {currentStep === "method" && (
-            <motion.div
+            <m.div
               key="method"
               initial={{ opacity: 0, x: 60 }}
               animate={{ opacity: 1, x: 0 }}
@@ -215,7 +215,7 @@ export default function CoffeeQuiz() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {METHODS.map((item) => (
-                  <motion.button
+                  <m.button
                     key={item.id}
                     whileHover={{ y: -6, scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -234,27 +234,27 @@ export default function CoffeeQuiz() {
                     </div>
                     <div>
                       <p className="font-serif text-2xl font-bold text-white mb-1">{item.label}</p>
-                      <p className="text-coffee-caramel/70 text-sm mb-4">{item.sublabel}</p>
+                      <p className="text-coffee-amber text-sm mb-4">{item.sublabel}</p>
                       <p className="text-white/50 text-sm leading-relaxed">{item.desc}</p>
                     </div>
                     {answers.method === item.id && (
-                      <motion.div
+                      <m.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         className="absolute top-4 right-4 w-6 h-6 bg-coffee-caramel rounded-full flex items-center justify-center"
                       >
                         <LuCheck className="w-3 h-3 text-white" />
-                      </motion.div>
+                      </m.div>
                     )}
-                  </motion.button>
+                  </m.button>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           )}
 
           {/* PALADAR */}
           {currentStep === "flavor" && (
-            <motion.div
+            <m.div
               key="flavor"
               initial={{ opacity: 0, x: 60 }}
               animate={{ opacity: 1, x: 0 }}
@@ -266,7 +266,7 @@ export default function CoffeeQuiz() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {FLAVORS.map((item) => (
-                  <motion.button
+                  <m.button
                     key={item.id}
                     whileHover={{ y: -6, scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -288,23 +288,23 @@ export default function CoffeeQuiz() {
                       <p className="text-white/50 text-sm leading-relaxed">{item.desc}</p>
                     </div>
                     {answers.flavor === item.id && (
-                      <motion.div
+                      <m.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         className="absolute top-4 right-4 w-6 h-6 bg-coffee-caramel rounded-full flex items-center justify-center"
                       >
                         <LuCheck className="w-3 h-3 text-white" />
-                      </motion.div>
+                      </m.div>
                     )}
-                  </motion.button>
+                  </m.button>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           )}
 
           {/* RESULTADO */}
           {currentStep === "result" && result && (
-            <motion.div
+            <m.div
               key="result"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -313,14 +313,14 @@ export default function CoffeeQuiz() {
               className="max-w-3xl mx-auto"
             >
               <div className="text-center mb-12">
-                <motion.div
+                <m.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                   className="w-24 h-24 bg-coffee-caramel/20 border border-coffee-caramel/40 rounded-full flex items-center justify-center mx-auto mb-8"
                 >
                   <LuCheck className="w-12 h-12 text-coffee-caramel" />
-                </motion.div>
+                </m.div>
                 <span className="text-coffee-amber tracking-[0.25em] text-xs uppercase font-medium block mb-4">
                   Seu Match Perfeito
                 </span>
@@ -352,12 +352,12 @@ export default function CoffeeQuiz() {
                 </button>
                 <button
                   onClick={() => { setAnswers({ method: "", flavor: "" }); setCurrentStep("intro"); }}
-                  className="text-sm text-white/40 hover:text-coffee-caramel underline transition-colors"
+                  className="text-sm text-white/60 hover:text-coffee-caramel underline transition-colors"
                 >
                   Refazer o Quiz
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           )}
 
         </AnimatePresence>

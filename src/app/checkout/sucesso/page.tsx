@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { LuArrowLeft, LuCircleCheck, LuPackage } from "react-icons/lu";
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 export default function CheckoutSuccessPage() {
   return (
@@ -22,13 +22,13 @@ export default function CheckoutSuccessPage() {
         <div className="absolute inset-0 bg-linear-to-t from-[#0a0705] via-[#0a0705]/80 to-[#0a0705]/40" />
       </div>
 
-      <motion.div 
+      <m.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: [0.215, 0.61, 0.355, 1] }}
         className="relative z-10 max-w-2xl text-center px-6"
       >
-        <motion.div 
+        <m.div 
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.3, type: "spring", stiffness: 200, damping: 20 }}
@@ -37,7 +37,7 @@ export default function CheckoutSuccessPage() {
           {/* Brilho pulsante */}
           <div className="absolute inset-0 rounded-full bg-coffee-caramel/30 animate-ping opacity-50" />
           <LuCircleCheck className="w-12 h-12 text-coffee-caramel relative z-10" />
-        </motion.div>
+        </m.div>
 
         <h1 className="font-serif text-5xl md:text-6xl text-white mb-6 tracking-tight">
           Sua jornada <br />
@@ -59,13 +59,13 @@ export default function CheckoutSuccessPage() {
 
           <Link 
             href="/" 
-            className="group flex items-center gap-3 bg-coffee-caramel hover:bg-[#c9803b] text-white px-8 py-4 rounded-full transition-all duration-300 shadow-[0_0_30px_rgba(184,115,51,0.2)]"
+            className="group flex items-center gap-3 bg-coffee-copper hover:bg-[#8c5422] text-white px-8 py-4 rounded-full transition-all duration-300 shadow-[0_0_30px_rgba(184,115,51,0.2)]"
           >
             <LuPackage className="w-5 h-5" />
             <span className="font-bold tracking-wide">Acompanhar Pedido</span>
           </Link>
         </div>
-      </motion.div>
+      </m.div>
       
       {/* Poeira Âmbar na Base */}
       <div className="absolute bottom-0 left-0 w-full h-[300px] bg-[radial-gradient(ellipse_at_bottom,rgba(184,115,51,0.15)_0%,transparent_70%)] pointer-events-none" />

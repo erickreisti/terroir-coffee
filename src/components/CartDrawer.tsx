@@ -35,7 +35,7 @@ export default function CartDrawer() {
 
         <div className="relative z-10 flex-grow overflow-y-auto p-6 custom-scrollbar">
           {items.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-white/40">
+            <div className="h-full flex flex-col items-center justify-center text-white/60">
               <LuShoppingBag className="w-16 h-16 text-white/10 mb-6 stroke-[1]" />
               <p className="text-lg font-light">Seu carrinho está vazio.</p>
               <button 
@@ -73,7 +73,7 @@ export default function CartDrawer() {
                   <div className="flex flex-col items-end gap-3">
                     <button 
                       onClick={() => removeItem(item.id)}
-                      className="text-xs text-white/30 hover:text-red-400 transition-colors uppercase tracking-widest font-medium"
+                      className="text-xs text-white/50 hover:text-red-400 transition-colors uppercase tracking-widest font-medium"
                     >
                       Remover
                     </button>
@@ -110,7 +110,7 @@ export default function CartDrawer() {
             <Link 
               href="/checkout"
               onClick={closeCart}
-              className="group relative w-full overflow-hidden bg-coffee-caramel hover:bg-[#c9803b] text-white py-4 rounded-full font-bold tracking-wide transition-all duration-300 flex items-center justify-center shadow-[0_0_30px_rgba(184,115,51,0.2)]"
+              className="group relative w-full overflow-hidden bg-coffee-copper hover:bg-[#8c5422] text-white py-4 rounded-full font-bold tracking-wide transition-all duration-300 flex items-center justify-center shadow-[0_0_30px_rgba(184,115,51,0.2)]"
             >
               <span className="relative z-10">Finalizar Pedido</span>
               <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />

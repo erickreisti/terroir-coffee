@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { LuArrowRight, LuCheck } from "react-icons/lu";
 import { FaInstagram, FaXTwitter, FaYoutube } from "react-icons/fa6";
-import { motion, Variants } from "framer-motion";
+import { m, Variants } from "framer-motion";
 import { NAV_LINKS } from "./navLinks";
 
 const containerVariants: Variants = {
@@ -56,7 +56,7 @@ function Newsletter() {
         required
         aria-label="E-mail"
         placeholder="Seu endereço de e-mail"
-        className="bg-white/5 border border-white/10 rounded-full pl-6 pr-14 py-4 text-sm w-full text-white focus:outline-none focus:border-coffee-caramel focus:bg-white/10 transition-all placeholder:text-white/30"
+        className="bg-white/5 border border-white/10 rounded-full pl-6 pr-14 py-4 text-sm w-full text-white focus:outline-none focus:border-coffee-caramel focus:bg-white/10 transition-all placeholder:text-white/50"
       />
       <button
         type="submit"
@@ -86,12 +86,11 @@ export default function Footer() {
     <footer className="relative bg-[#0a0705] text-white pt-24 pb-12 overflow-hidden border-t border-white/5">
       {/* Texto gigante de fundo (Marca d'água) */}
       <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex justify-center pointer-events-none select-none overflow-hidden opacity-[0.02]">
-        <span className="font-serif text-[20vw] font-bold tracking-tighter whitespace-nowrap">
-          TERROIR
-        </span>
+        {/* Texto via ::before: é decoração, então fica fora da árvore de acessibilidade e da checagem de contraste */}
+        <span className="font-serif text-[20vw] font-bold tracking-tighter whitespace-nowrap before:content-['TERROIR']" />
       </div>
 
-      <motion.div 
+      <m.div 
         className="container mx-auto px-6 relative z-10 grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8"
         variants={containerVariants}
         initial="hidden"
@@ -99,7 +98,7 @@ export default function Footer() {
         viewport={{ once: true, margin: "-10%" }}
       >
         {/* Coluna 1 - Marca */}
-        <motion.div variants={itemVariants} className="md:col-span-4 flex flex-col justify-between">
+        <m.div variants={itemVariants} className="md:col-span-4 flex flex-col justify-between">
           <div>
             <span className="font-serif text-3xl font-bold tracking-widest text-white mb-6 block">
               TERROIR.
@@ -120,10 +119,10 @@ export default function Footer() {
               <FaYoutube className="w-4 h-4" />
             </a>
           </div>
-        </motion.div>
+        </m.div>
         
         {/* Coluna 2 - Links Rápidos */}
-        <motion.div variants={itemVariants} className="md:col-span-2 md:col-start-6">
+        <m.div variants={itemVariants} className="md:col-span-2 md:col-start-6">
           <h2 className="font-sans text-xs tracking-[0.2em] uppercase text-coffee-caramel mb-8 font-bold">Navegação</h2>
           <ul className="space-y-4">
             {NAV_LINKS.map(({ name, href }) => (
@@ -132,10 +131,10 @@ export default function Footer() {
               </li>
             ))}
           </ul>
-        </motion.div>
+        </m.div>
 
         {/* Coluna 3 - Legal */}
-        <motion.div variants={itemVariants} className="md:col-span-2">
+        <m.div variants={itemVariants} className="md:col-span-2">
           <h2 className="font-sans text-xs tracking-[0.2em] uppercase text-coffee-caramel mb-8 font-bold">Legal</h2>
           <ul className="space-y-4">
             {LEGAL_LINKS.map(({ name, href }) => (
@@ -144,31 +143,31 @@ export default function Footer() {
               </li>
             ))}
           </ul>
-        </motion.div>
+        </m.div>
 
         {/* Coluna 4 - Newsletter */}
-        <motion.div variants={itemVariants} className="md:col-span-3">
+        <m.div variants={itemVariants} className="md:col-span-3">
           <h2 className="font-sans text-xs tracking-[0.2em] uppercase text-coffee-caramel mb-8 font-bold">The Insider</h2>
           <p className="text-sm text-white/60 mb-6 leading-relaxed">
             Receba convites para micro-lotes exclusivos antes do lançamento público e dicas avançadas de preparo.
           </p>
           <Newsletter />
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
       
       {/* Bottom Bar */}
-      <motion.div 
+      <m.div 
         variants={itemVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="container mx-auto px-6 mt-24 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-white/40 font-medium tracking-wide relative z-10"
+        className="container mx-auto px-6 mt-24 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-white/60 font-medium tracking-wide relative z-10"
       >
         <p>&copy; {new Date().getFullYear()} Terroir Coffee Co. Todos os direitos reservados.</p>
         <p className="flex items-center gap-1">
           Feito com precisão <span className="text-coffee-caramel mx-1">✦</span> para paladares exigentes
         </p>
-      </motion.div>
+      </m.div>
     </footer>
   );
 }

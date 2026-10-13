@@ -50,7 +50,7 @@ function LoopVideo({ name, fadeColor, className = "", videoRef, autoPlay, load }
   // O vídeo principal só começa a baixar depois do LCP (o poster já cobre o LCP)
   // e nem baixa com economia de dados ligada ou em 2G
   const [heroReady, setHeroReady] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(!autoPlay);
+  const [isPlaying, setIsPlaying] = useState(false);
   const src = (autoPlay ? heroReady : load) ? `/videos/${name}.mp4` : undefined;
 
   useEffect(() => {
@@ -62,25 +62,22 @@ function LoopVideo({ name, fadeColor, className = "", videoRef, autoPlay, load }
 
   return (
     <>
-      {/* No vídeo principal, o poster vira uma <img> de alta prioridade: é ela que conta
-          como LCP (pinta no primeiro paint), e o vídeo entra por cima quando carrega */}
-      {autoPlay && (
-        // No celular usa uma versão menor do poster (~40 KB em vez de ~75 KB)
-        <picture>
-          <source media="(max-width: 767px)" srcSet={`/images/poster-${name}-mobile.webp`} />
-          <img
-            src={`/images/poster-${name}.webp`}
-            alt=""
-            fetchPriority="high"
-            className={`absolute inset-0 w-full h-full object-cover ${className}`}
-          />
-        </picture>
-      )}
+      {/* O poster é uma <img> por baixo do vídeo, que entra por cima quando começa a tocar.
+          No principal ela tem alta prioridade e é o LCP (pinta no primeiro paint); nos cards
+          tem prioridade baixa para não disputar banda com ela */}
+      <picture>
+        {/* No celular usa uma versão menor do poster (cerca de metade do peso) */}
+        <source media="(max-width: 767px)" srcSet={`/images/poster-${name}-mobile.webp`} />
+        <img
+          src={`/images/poster-${name}.webp`}
+          alt=""
+          fetchPriority={autoPlay ? "high" : "low"}
+          className={`absolute inset-0 w-full h-full object-cover ${className}`}
+        />
+      </picture>
       <video
         ref={videoRef}
         src={src}
-        // O vídeo principal já tem a <img> por baixo; poster só nos cards (evita baixar a versão desktop no celular)
-        poster={autoPlay ? undefined : `/images/poster-${name}.webp`}
         autoPlay={autoPlay}
         preload="auto"
         onPlaying={() => setIsPlaying(true)}

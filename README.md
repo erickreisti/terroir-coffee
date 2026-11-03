@@ -72,10 +72,11 @@ npm run dev
 
 Abra [http://localhost:3000](http://localhost:3000) com seu navegador para ver o resultado.
 
-## 👤 Autor
+## 👤 Autoria
 
-Desenvolvido por **Erick**. 
+Desenvolvido pela **[Inside Quantic](https://www.insidequantic.com.br)**.
 
-Seja para trocar ideias sobre interfaces premium, performance no Front-End ou novos projetos, fique à vontade para conectar-se:
+Para conversar sobre um projeto:
 
-- GitHub: [@erickreisti](https://github.com/erickreisti)
+- Site: [insidequantic.com.br](https://www.insidequantic.com.br)
+- Instagram: [@insidequantic.dev](https://www.instagram.com/insidequantic.dev)

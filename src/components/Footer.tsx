@@ -167,6 +167,12 @@ export default function Footer() {
         <p className="flex items-center gap-1">
           Feito com precisão <span className="text-coffee-caramel mx-1">✦</span> para paladares exigentes
         </p>
+        <p>
+          Desenvolvido pela{" "}
+          <a href="https://www.insidequantic.com.br" target="_blank" rel="noopener" className="text-white/80 underline underline-offset-4 hover:text-coffee-caramel transition-colors">
+            Inside Quantic
+          </a>
+        </p>
       </m.div>
     </footer>
   );
